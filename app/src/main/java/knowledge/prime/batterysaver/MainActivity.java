@@ -15,9 +15,9 @@ import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
-    private long sleepTime = 5000;
-    private long wakeupTime = 10000;
-    private long idleTime = 1000;
+    private long sleepTime = 120000;
+    private long wakeupTime = 60000;
+    private long idleTime = 60000;
 
     private WifiManager wifi;
 
@@ -52,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
                 if (idleEditText.getText() != null) {
                     idleTime = Long.valueOf(idleEditText.getText().toString()).longValue();
                 }
+
+
+                switchWakeupOrSleep();
             }
         });
 
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         switchWakeupOrSleep();
+
     }
 
 
@@ -71,20 +75,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean isSleep;
 
     private void switchWakeupOrSleep() {
-        if (isStop) {
-            return;
-        }
-
         Log.d("time", "wakeup:" + wakeupTime + ", sleep:" + sleepTime + ", idle:" + idleTime);
 
         if (isSleep) {
             //go wakeup
-            Log.d("d", "go wakeup");
+            Log.d("d", "ready wakeup");
             wakeUp();
             isSleep = false;
         } else {
             //go sleep
-            Log.d("d", "go sleep");
+            Log.d("d", "ready sleep");
             sleep();
             isSleep = true;
         }
@@ -94,23 +94,33 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (isStop) {
+                    Log.d("s", "stoped.");
+                    return;
+                }
                 Log.d("s", "called wakeUp");
                 WifiHandler.wakeup(wifi);
                 mobiledataenable(true);
                 switchWakeupOrSleep();
+
             }
         }, sleepTime);//遅延実行のため sleepTime後に wakeup が実行される
+
     }
 
     private void sleep() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (isStop) {
+                    Log.d("s", "stoped.");
+                    return;
+                }
+
                 Log.d("s", "called sleep");
                 WifiHandler.sleep(wifi);
                 mobiledataenable(false);
                 switchWakeupOrSleep();
-
             }
         }, wakeupTime);
     }
