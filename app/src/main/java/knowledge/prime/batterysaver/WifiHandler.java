@@ -7,13 +7,19 @@ import android.net.wifi.WifiManager;
  */
 public class WifiHandler {
 
-    public static void wakeup(WifiManager wifi) {
-        wifi.setWifiEnabled(true);
+    private static WifiManager wifi;
+
+    public static void init(WifiManager w) {
+        wifi = w;
     }
 
+    public static void isConnect(boolean is) {
 
-    public static void sleep(WifiManager wifi) {
-        wifi.setWifiEnabled(false);
+        if (wifi.isWifiEnabled() == is) {
+            return;
+        }
+
+        wifi.setWifiEnabled(is);
     }
 
 
