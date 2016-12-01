@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Env.sleepTime  = 300000;
+        Env.sleepTime  = 60000;
         Env.wakeupTime = 60000;
 
         Env.idleTime   = 60000;
@@ -39,12 +39,24 @@ public class MainActivity extends AppCompatActivity {
         Calendar triggerTime = Calendar.getInstance();
 
         //設定した日時で発行するIntentを生成
-        Intent intent = new Intent(MainActivity.this, BtReciver.class);
-        final PendingIntent sender = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
+        final PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //日時と発行するIntentをAlarmManagerにセットします
         final AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, sender);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
+
+
+        //設定した日時で発行するIntentを生成
+        Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
+        final PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //日時と発行するIntentをAlarmManagerにセットします
+        final AlarmManager sleepManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        sleepManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
+
+
+
 
         //スクリーンの状態 on/off
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -75,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Calendar triggerTime = Calendar.getInstance();
-                manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, sender);
+                manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
+                sleepManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
 
             }
         });
@@ -83,9 +96,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.stopButton).setOnClickListener(new View.OnClickListener() {
                  @Override
                  public void onClick(View view) {
-                     manager.cancel(sender);
+                     manager.cancel(wakeupSender);
+                     sleepManager.cancel(sleepSender);
                      Env.isStop = true;
-
+                    Log.d("call", "stop called");
                  }
              }
         );
@@ -112,8 +126,13 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
-
         registerReceiver(new BtReciver(), filter);
+
+//        IntentFilter ifilter = new IntentFilter();
+//        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+
+
+//        Intent batteryStatus = this.registerReceiver(null, ifilter);
 
 
         Log.d("time", "wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
