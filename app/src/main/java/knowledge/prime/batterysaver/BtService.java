@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -31,8 +30,8 @@ public class BtService extends IntentService {
 
 
             //
-            if (Env.batteryStatus != null && BatteryManager.BATTERY_STATUS_CHARGING == Env.batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1)) {
-                Log.d("plug", "always on, charging");
+            if (Env.isPlugged) {
+                Log.d("plug", "always on, because charging");
                 WifiHandler.isConnect(BtService.this, true);
                 isConnectMobile(true);
 

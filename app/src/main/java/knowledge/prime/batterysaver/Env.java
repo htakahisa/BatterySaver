@@ -1,7 +1,5 @@
 package knowledge.prime.batterysaver;
 
-import android.content.Intent;
-
 /**
  * Created by takahisa007 on 11/30/16.
  */
@@ -18,8 +16,7 @@ public class Env {
 
     public static boolean isScreenOffIdle;
 
-    public static Intent batteryStatus;
-
+    public static boolean isPlugged;
 
     public static boolean isDebug = false;
 }

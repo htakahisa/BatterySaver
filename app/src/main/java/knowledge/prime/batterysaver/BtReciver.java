@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -41,17 +42,18 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 return;
 
 
-//            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-//                //バッテリー接続時は ON のまま
-//                int plugged = intent.getIntExtra("plugged", 0);
-//                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-//                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
-//                        ) {
-//                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-//                    WifiHandler.isConnect(true);
-//                    MobileDataHandler.isConnect(true);
-//                }
-//                return;
+            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
+                //バッテリー接続時は ON のまま
+                int plugged = intent.getIntExtra("plugged", 0);
+                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
+                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
+                        ) {
+                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
+                    Env.isPlugged = true;
+                } else {
+                    Log.d("plug", "plug is unplugged");
+                    Env.isPlugged = false;
+                }
             } else {
                 Log.d("intent", action);
                 return;

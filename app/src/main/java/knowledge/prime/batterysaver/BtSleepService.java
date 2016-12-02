@@ -59,12 +59,16 @@ public class BtSleepService extends IntentService {
                 return;
             }
             if (Env.isScreenOn) {
-                Log.d("s", "stop skip. 'case screen on");
+                Log.d("s", "skip stop. because screen on");
                 return;
             }
             if (Env.isScreenOffIdle) {
                 Log.d("s", "skip stop. because screen off idle");
                 Env.isScreenOffIdle = false;
+                return;
+            }
+            if (Env.isPlugged) {
+                Log.d("plug", "skip stop, because plugged.");
                 return;
             }
             Log.d("s", "called stop");
