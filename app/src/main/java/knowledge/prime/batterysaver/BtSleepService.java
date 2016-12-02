@@ -1,9 +1,14 @@
 package knowledge.prime.batterysaver;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Created by takahisa007 on 12/1/16.
@@ -63,12 +68,31 @@ public class BtSleepService extends IntentService {
                 return;
             }
             Log.d("s", "called stop");
-            WifiHandler.isConnect(false);
-            MobileDataHandler.isConnect(false);
+            WifiHandler.isConnect(BtSleepService.this, false);
+            isConnectMobile(false);
 
         } finally {
             // Wakelockの解除処理が必ず呼ばれるようにしておく
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        }
+    }
+
+
+    private void isConnectMobile(boolean isConnect) {
+        try {
+            final ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            final Class<?> conmanClass = Class.forName(conman.getClass().getName());
+            final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
+            iConnectivityManagerField.setAccessible(true);
+            final Object iConnectivityManager = iConnectivityManagerField.get(conman);
+            final Class<?> iConnectivityManagerClass = Class.forName(iConnectivityManager.getClass().getName());
+            final Method setMobileDataEnabledMethod = iConnectivityManagerClass.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
+            setMobileDataEnabledMethod.setAccessible(true);
+
+            setMobileDataEnabledMethod.invoke(iConnectivityManager, isConnect);
+
+        } catch (Exception e) {
+
         }
     }
 }

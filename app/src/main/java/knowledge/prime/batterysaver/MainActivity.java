@@ -28,34 +28,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Env.sleepTime  = 60000;
+        Env.sleepTime  = 300000;
         Env.wakeupTime = 60000;
 
         Env.idleTime   = 60000;
 
 
-        // alermManager設定
-        //呼び出す日時を設定する
-        Calendar triggerTime = Calendar.getInstance();
-
-        //設定した日時で発行するIntentを生成
-        Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
-        final PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //日時と発行するIntentをAlarmManagerにセットします
-        final AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
-
-
-        //設定した日時で発行するIntentを生成
-        Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
-        final PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //日時と発行するIntentをAlarmManagerにセットします
-        final AlarmManager sleepManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        sleepManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
-
-
+        //alermmanager setting
+        this.setManager(Calendar.getInstance());
 
 
         //スクリーンの状態 on/off
@@ -87,17 +67,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Calendar triggerTime = Calendar.getInstance();
-                manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
-                sleepManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
-
+                setManager(triggerTime);
             }
         });
 
         findViewById(R.id.stopButton).setOnClickListener(new View.OnClickListener() {
                  @Override
                  public void onClick(View view) {
-                     manager.cancel(wakeupSender);
-                     sleepManager.cancel(sleepSender);
+                     cancelManager();
                      Env.isStop = true;
                     Log.d("call", "stop called");
                  }
@@ -106,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //初期化
-        WifiHandler.init((WifiManager)getSystemService(WIFI_SERVICE));
+        WifiHandler.init((WifiManager)getSystemService( WIFI_SERVICE));
 
         try {
             final ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -117,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
             final Class<?> iConnectivityManagerClass = Class.forName(iConnectivityManager.getClass().getName());
             final Method setMobileDataEnabledMethod = iConnectivityManagerClass.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
             setMobileDataEnabledMethod.setAccessible(true);
+            setMobileDataEnabledMethod.invoke(iConnectivityManager, true);
 
-            MobileDataHandler.init(iConnectivityManager, setMobileDataEnabledMethod);
         } catch (Exception e) {
 
         }
@@ -138,7 +115,38 @@ public class MainActivity extends AppCompatActivity {
         Log.d("time", "wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
     }
 
+    public void cancelManager() {
+        Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
+        PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
+        PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        manager.cancel(wakeupSender);
+        manager.cancel(sleepSender);
+    }
+
+    public void setManager(Calendar triggerTime) {
+        // alermManager設定
+
+        //設定した日時で発行するIntentを生成
+        Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
+        PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //日時と発行するIntentをAlarmManagerにセットします
+        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
+
+
+        //設定した日時で発行するIntentを生成
+        Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
+        PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //日時と発行するIntentをAlarmManagerにセットします
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
+
+
+    }
 
     private boolean isSleep;
 

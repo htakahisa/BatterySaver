@@ -21,6 +21,6 @@ public class Env {
     public static Intent batteryStatus;
 
 
-    public static boolean isDebug = true;
+    public static boolean isDebug = false;
 }
 

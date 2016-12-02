@@ -1,10 +1,15 @@
 package knowledge.prime.batterysaver;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Created by takahisa007 on 12/1/16.
@@ -24,39 +29,12 @@ public class BtService extends IntentService {
             Log.d("call", "RECIVE wakeup, wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
 
 
-            String action = intent.getAction();
-            if (action != null) {
-                if (action.equals(Intent.ACTION_SCREEN_ON)) {
-                    // 画面ON時
-                    Log.d("screen", "SCREEN_ON");
-                    Env.isScreenOn = true;
-                    return;
-                } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-                    // 画面OFF時
-                    Log.d("screen", "SCREEN_OFF");
-                    Env.isScreenOn = false;
-                    return;
-//            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-//                //バッテリー接続時は ON のまま
-//                int plugged = intent.getIntExtra("plugged", 0);
-//                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-//                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
-//                        ) {
-//                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-//                    WifiHandler.isConnect(true);
-//                    MobileDataHandler.isConnect(true);
-//                }
-//                return;
-                } else {
-                    Log.d("intent", action);
-                }
-            }
 
             //
             if (Env.batteryStatus != null && BatteryManager.BATTERY_STATUS_CHARGING == Env.batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1)) {
                 Log.d("plug", "always on, charging");
-                WifiHandler.isConnect(true);
-                MobileDataHandler.isConnect(true);
+                WifiHandler.isConnect(BtService.this, true);
+                isConnectMobile(true);
 
                 return;
             }
@@ -64,20 +42,41 @@ public class BtService extends IntentService {
             //画面がONの時は常に wakeup
             if (Env.isScreenOn && !Env.isDebug) {
                 Log.d("screen", "always wake up because screen on.");
-                WifiHandler.isConnect(true);
-                MobileDataHandler.isConnect(true);
+                WifiHandler.isConnect(BtService.this, true);
+                isConnectMobile(true);
                 return;
             }
 
+
             //まずは設定 ON (すでに ON なら何もしない)
             Log.d("d", "wakeup");
-            WifiHandler.isConnect(true);
-            MobileDataHandler.isConnect(true);
+            WifiHandler.isConnect(BtService.this, true);
+            isConnectMobile(true);
 
 
     } finally {
             // Wakelockの解除処理が必ず呼ばれるようにしておく
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        }
+    }
+
+
+
+    private void isConnectMobile(boolean isConnect) {
+        try {
+            final ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            final Class<?> conmanClass = Class.forName(conman.getClass().getName());
+            final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
+            iConnectivityManagerField.setAccessible(true);
+            final Object iConnectivityManager = iConnectivityManagerField.get(conman);
+            final Class<?> iConnectivityManagerClass = Class.forName(iConnectivityManager.getClass().getName());
+            final Method setMobileDataEnabledMethod = iConnectivityManagerClass.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
+            setMobileDataEnabledMethod.setAccessible(true);
+
+            setMobileDataEnabledMethod.invoke(iConnectivityManager, isConnect);
+
+        } catch (Exception e) {
+
         }
     }
 }

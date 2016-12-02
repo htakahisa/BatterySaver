@@ -1,5 +1,6 @@
 package knowledge.prime.batterysaver;
 
+import android.content.Context;
 import android.net.wifi.WifiManager;
 
 /**
@@ -13,7 +14,12 @@ public class WifiHandler {
         wifi = w;
     }
 
-    public static void isConnect(boolean is) {
+    public static void isConnect(Context context, boolean is) {
+
+        if (wifi == null) {
+            wifi = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+        }
+
 
         if (wifi.isWifiEnabled() == is) {
             return;
