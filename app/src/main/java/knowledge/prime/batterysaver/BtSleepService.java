@@ -36,17 +36,6 @@ public class BtSleepService extends IntentService {
                     Log.d("screen", "SCREEN_OFF");
                     Env.isScreenOn = false;
                     return;
-    //            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-    //                //バッテリー接続時は ON のまま
-    //                int plugged = intent.getIntExtra("plugged", 0);
-    //                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-    //                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
-    //                        ) {
-    //                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-    //                    WifiHandler.isConnect(true);
-    //                    MobileDataHandler.isConnect(true);
-    //                }
-    //                return;
                 } else {
                     Log.d("intent", action);
                 }

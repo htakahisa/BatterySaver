@@ -2,24 +2,28 @@ package knowledge.prime.batterysaver;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
-import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,57 +38,31 @@ public class MainActivity extends AppCompatActivity {
 
         Env.idleTime   = 60000;
 
+        //初期値のセット
+        EditText sleepText = (EditText)findViewById(R.id.sleepTimeInput);
+        sleepText.setText(String.valueOf(Env.sleepTime));
+
+        EditText wakeupText = (EditText)findViewById(R.id.wakeupTimeInput);
+        wakeupText.setText(String.valueOf(Env.wakeupTime));
+
+        EditText idleText = (EditText)findViewById(R.id.idleTimeInput);
+        idleText.setText(String.valueOf(Env.idleTime));
 
         //alermmanager setting
         this.setManager(Calendar.getInstance());
-
 
         //スクリーンの状態 on/off
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         Env.isScreenOn= pm.isScreenOn();
 
+        //ON/OFF ボタンイベントの設定
+        setOnOffButtonEvent();
 
-        //done ボタンのイベントセット
-        findViewById(R.id.doneButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Env.isStop = false;
-
-                //sleeptime
-                EditText sleepEditText = (EditText) findViewById(R.id.sleepTimeInput);
-                if (sleepEditText.getText() != null) {
-                    Env.sleepTime = Long.valueOf(sleepEditText.getText().toString()).longValue();
-                }
-                //wakeuptime
-                EditText wakeupEditText = (EditText) findViewById(R.id.wakeupTimeInput);
-                if (wakeupEditText.getText() != null) {
-                    Env.wakeupTime = Long.valueOf(wakeupEditText.getText().toString()).longValue();
-                }
-                //idletime
-                EditText idleEditText = (EditText) findViewById(R.id.idleTimeInput);
-                if (idleEditText.getText() != null) {
-                    Env.idleTime = Long.valueOf(idleEditText.getText().toString()).longValue();
-                }
-
-                Calendar triggerTime = Calendar.getInstance();
-                setManager(triggerTime);
-            }
-        });
-
-        findViewById(R.id.stopButton).setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View view) {
-                     cancelManager();
-                     Env.isStop = true;
-                    Log.d("call", "stop called");
-                 }
-             }
-        );
-
+        //Logcat イベントの設定
+        setLogcatEvent();
 
         //初期化
-        WifiHandler.init((WifiManager)getSystemService( WIFI_SERVICE));
+        WifiHandler.init((WifiManager)getSystemService(WIFI_SERVICE));
 
         try {
             final ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -104,25 +82,101 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(new BtReciver(), filter);
 
-
-//        IntentFilter ifilter = new IntentFilter();
-        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-
-        Intent batteryStatus = this.registerReceiver(new BtReciver(), filter);
-        int plugged = batteryStatus.getIntExtra("plugged", 0);
-        if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-                || plugged == BatteryManager.BATTERY_PLUGGED_USB
-                ) {
-            Env.isPlugged = true;
-            Log.d("plug", "init plugged");
-        } else {
-            Env.isPlugged = false;
-            Log.d("plug", "init unplugged");
-        }
-
         Log.d("time", "wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
+    }
+
+    /**
+     * Logcat のログを出力します。
+     */
+    private void setLogcatEvent() {
+        TextView view = (TextView)findViewById(R.id.logcat);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int maxLine = 8;
+                StringBuilder commandLine = new StringBuilder();
+                commandLine.append("logcat ");
+                commandLine.append("-d ");
+                commandLine.append("-v ");
+                commandLine.append("time ");
+//                commandLine.append("-s ");
+
+                try{
+                    //clear
+
+                    Process process = Runtime.getRuntime().exec(commandLine.toString());
+                    BufferedReader br = new BufferedReader( new InputStreamReader(process.getInputStream()), 1024);
+                    String thisLine;
+                    List<String> logList = new ArrayList<String>();
+                    StringBuilder sb = new StringBuilder();
+                    while ((thisLine = br.readLine()) != null) {
+//                        if (i++ >= maxLine) {
+//                            break;
+//                        }
+                        logList.add(thisLine);
+                    }
+                    int startLine = logList.size() - maxLine;
+                    if (startLine < 0) {
+                        startLine = 0;
+                    }
+                    for (int i = logList.size() - 1; i >= startLine ; i--) {
+                        sb.append(logList.get(i)).append(System.getProperty("line.separator"));
+                    }
+
+                    ((TextView)view).setText(sb.toString());
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
+    }
+
+    /**
+     * ON/OFF のボタンのイベント。節電をスタートしたり、ストップする。
+     */
+    private void setOnOffButtonEvent() {
+        //on/off ボタンのイベントセット
+        Switch onOff = (Switch)findViewById(R.id.onoff);
+        onOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isOn) {
+                if (isOn) {
+                    Env.isStop = false;
+
+                    //sleeptime
+                    EditText sleepEditText = (EditText) findViewById(R.id.sleepTimeInput);
+                    if (sleepEditText.getText() != null) {
+                        Env.sleepTime = Long.valueOf(sleepEditText.getText().toString()).longValue();
+                    }
+                    //wakeuptime
+                    EditText wakeupEditText = (EditText) findViewById(R.id.wakeupTimeInput);
+                    if (wakeupEditText.getText() != null) {
+                        Env.wakeupTime = Long.valueOf(wakeupEditText.getText().toString()).longValue();
+                    }
+                    //idletime
+                    EditText idleEditText = (EditText) findViewById(R.id.idleTimeInput);
+                    if (idleEditText.getText() != null) {
+                        Env.idleTime = Long.valueOf(idleEditText.getText().toString()).longValue();
+                    }
+
+                    Calendar triggerTime = Calendar.getInstance();
+                    setManager(triggerTime);
+                    Log.d("call", "start called");
+                } else {
+                    cancelManager();
+                    Env.isStop = true;
+                    Log.d("call", "stop called");
+                }
+            }
+        });
     }
 
     public void cancelManager() {
@@ -157,77 +211,4 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-    private boolean isSleep;
-
-    private void switchWakeupOrSleep() {
-        Log.d("time", "wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
-
-        if (isSleep) {
-            //go wakeup
-            Log.d("d", "ready wakeup");
-            wakeUp();
-            isSleep = false;
-        } else {
-            //go sleep
-            Log.d("d", "ready sleep");
-            sleep();
-            isSleep = true;
-        }
-    }
-
-    private void wakeUp() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (Env.isStop) {
-                    Log.d("s", "stoped.");
-                    return;
-                }
-                Log.d("s", "called wakeUp");
-                switchWakeupOrSleep();
-
-            }
-        }, Env.sleepTime);//遅延実行のため sleepTime後に wakeup が実行される
-
-    }
-
-    private void sleep() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (Env.isStop) {
-                    Log.d("s", "stoped.");
-                    return;
-                }
-
-                Log.d("s", "called sleep");
-                switchWakeupOrSleep();
-            }
-        }, Env.wakeupTime);
-    }
-
-
-    private void setIntentFilter() {
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        this.getApplicationContext().registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d("screen", "screen on");
-            }
-        }, filter);
-
-        filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-        this.getApplicationContext().registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                System.out.println("onReceive 3");
-            }
-        }, filter);
-    }
-
-
-
-
-
 }

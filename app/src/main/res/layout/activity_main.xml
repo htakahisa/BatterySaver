@@ -22,11 +22,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal">
 
-            <EditText
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText3"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="sleep"
+                android:id="@+id/textView"
                 android:layout_weight="1" />
 
             <EditText
@@ -43,11 +44,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:layout_width="match_parent"
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText4"
-                android:text="wakeup" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="wakeup"
+                android:id="@+id/textView2" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -63,11 +66,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:layout_width="match_parent"
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText5"
-                android:text="idle" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="idle"
+                android:id="@+id/textView3" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -77,18 +82,37 @@
                 android:id="@+id/idleTimeInput" />
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="done"
-            android:id="@+id/doneButton"
-            android:layout_gravity="center_horizontal" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stop"
-            android:id="@+id/stopButton"
-            android:layout_gravity="center_horizontal" />
+            <Switch
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ON/OFF"
+                android:id="@+id/onoff"
+                android:checked="true" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/scrollView"
+            android:fillViewport="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/logcat"
+                android:layout_gravity="center_horizontal"
+                android:text="logcat"
+                android:inputType="textImeMultiLine|text|textMultiLine"
+                android:singleLine="false" />
+
+        </ScrollView>
+
+
     </LinearLayout>
 </RelativeLayout>

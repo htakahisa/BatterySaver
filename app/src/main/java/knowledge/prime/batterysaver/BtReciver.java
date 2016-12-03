@@ -19,14 +19,13 @@ public class BtReciver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        Env.isPlugged = false;//ここで初期化しておく
+
         String action = intent.getAction();
         if (action != null) {
             if (Intent.ACTION_TIME_CHANGED.equals(action) || Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
                 Log.d("recive", "time change ;" + action);
-//                //cancel
-//                cancelManager(context);
-//                //再設定
-//                setManager(context, Calendar.getInstance());
+                // but it seems to need to do nothing.
                 return;
              } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 // 画面ON時
@@ -53,7 +52,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 } else {
                     Log.d("plug", "plug is unplugged");
                     Env.isPlugged = false;
+
                 }
+                return;
             } else {
                 Log.d("intent", action);
                 return;
