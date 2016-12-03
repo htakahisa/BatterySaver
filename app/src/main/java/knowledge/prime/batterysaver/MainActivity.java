@@ -1,6 +1,8 @@
 package knowledge.prime.batterysaver;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -84,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(new BtReciver(), filter);
+
+        //通知アイコン設定
+        this.setNotification();
 
         Log.d("time", "wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
     }
@@ -169,10 +174,12 @@ public class MainActivity extends AppCompatActivity {
 
                     Calendar triggerTime = Calendar.getInstance();
                     setManager(triggerTime);
+                    setNotification();
                     Log.d("call", "start called");
                 } else {
                     cancelManager();
                     Env.isStop = true;
+                    deleteNotification();
                     Log.d("call", "stop called");
                 }
             }
@@ -210,5 +217,28 @@ public class MainActivity extends AppCompatActivity {
         manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
 
 
+    }
+
+    private void setNotification() {
+        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        Notification notif= new Notification.Builder(this)
+                .setContentTitle(getString(R.string.app_name))
+//                .setContentText("")
+                .setSmallIcon(R.drawable.status_bar_notification)
+                .setContentIntent(contentIntent)
+                .build();
+        //常駐させる
+        notif.flags = Notification.FLAG_ONGOING_EVENT;
+        nm.notify(1, notif);
+
+    }
+
+    private void deleteNotification() {
+        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        nm.cancel(1);
     }
 }

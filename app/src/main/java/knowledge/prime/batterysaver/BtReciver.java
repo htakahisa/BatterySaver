@@ -1,6 +1,8 @@
 package knowledge.prime.batterysaver;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -55,6 +57,11 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
                 }
                 return;
+            } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)){
+                //起動時は再設定
+                setManager(context, Calendar.getInstance());
+                setNotification(context);
+                return;
             } else {
                 Log.d("intent", action);
                 return;
@@ -98,6 +105,25 @@ public class BtReciver extends WakefulBroadcastReceiver {
         //日時と発行するIntentをAlarmManagerにセットします
         manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
 
+
+    }
+
+
+    private void setNotification(Context context) {
+        NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                context, 0,
+                new Intent(context, MainActivity.class), 0);
+
+        Notification notif= new Notification.Builder(context)
+                .setContentTitle(context.getString(R.string.app_name))
+//                .setContentText("")
+                .setSmallIcon(R.drawable.status_bar_notification)
+                .setContentIntent(contentIntent)
+                .build();
+        //常駐させる
+        notif.flags = Notification.FLAG_ONGOING_EVENT;
+        nm.notify(1, notif);
 
     }
 }
