@@ -59,8 +59,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 return;
             } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)){
                 //起動時は再設定
-                setManager(context, Calendar.getInstance());
-                setNotification(context);
+                Intent intentActivity = new Intent(context, MainActivity.class);
+                intentActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intentActivity);
                 return;
             } else {
                 Log.d("intent", action);

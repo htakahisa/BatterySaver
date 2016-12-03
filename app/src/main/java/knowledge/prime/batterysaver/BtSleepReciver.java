@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -19,21 +18,15 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
 
         String action = intent.getAction();
         if (action != null) {
-            if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-                // 画面OFF時
-                Log.d("screen", "SCREEN_OFF");
-                Env.isScreenOn = false;
-                //再設定
-                cancelManager(context);
-                setManager(context, Calendar.getInstance());
-                return;
-            }
             return;
         }
-            Intent serviceIntent = new Intent(context,BtSleepService.class);
-            serviceIntent.setAction(intent.getAction());
-            // サービス起動
-            startWakefulService(context,serviceIntent);
+
+
+
+        Intent serviceIntent = new Intent(context,BtSleepService.class);
+        serviceIntent.setAction(intent.getAction());
+        // サービス起動
+        startWakefulService(context,serviceIntent);
 
     }
 

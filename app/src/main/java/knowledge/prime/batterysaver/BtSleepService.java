@@ -24,25 +24,6 @@ public class BtSleepService extends IntentService {
         try {
             Log.d("call", "RECIVE sleep, wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
 
-            String action = intent.getAction();
-            if (action != null) {
-                if (action.equals(Intent.ACTION_SCREEN_ON)) {
-                    // 画面ON時
-                    Log.d("screen", "SCREEN_ON");
-                    Env.isScreenOn = true;
-                    return;
-                } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-                    // 画面OFF時
-                    Log.d("screen", "SCREEN_OFF");
-                    Env.isScreenOn = false;
-                    return;
-                } else {
-                    Log.d("intent", action);
-                }
-            }
-
-
-
             if (Env.isStop) {
                 Log.d("s", "stoped.");
                 return;
