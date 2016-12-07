@@ -32,18 +32,40 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Env.sleepTime  = 300000;
-        Env.wakeupTime = 60000;
+        Env.sleepTime   =  60000;
+        Env.sleepTime2  = 300000;
+        Env.sleepTime3  = 600000;
+        Env.sleepTime4  = 900000;
 
-        Env.idleTime   = 60000;
+        Env.wakeupTime =   60000;
+        Env.idleTime   =   60000;
+
+        Env.count = 1;
+        Env.count2 = 3;
+        Env.count3 = 3;
+
+        Env.intervalType = 1;
 
         //初期値のセット
         EditText sleepText = (EditText)findViewById(R.id.sleepTimeInput);
         sleepText.setText(String.valueOf(Env.sleepTime));
+        EditText sleepText2 = (EditText)findViewById(R.id.sleepTimeInput2);
+        sleepText2.setText(String.valueOf(Env.sleepTime2));
+        EditText sleepText3 = (EditText)findViewById(R.id.sleepTimeInput3);
+        sleepText3.setText(String.valueOf(Env.sleepTime3));
+        EditText sleepText4 = (EditText)findViewById(R.id.sleepTimeInput4);
+        sleepText4.setText(String.valueOf(Env.sleepTime4));
+
+        EditText sCountText = (EditText)findViewById(R.id.count1);
+        sCountText.setText(String.valueOf(Env.count));
+        EditText sCountText2 = (EditText)findViewById(R.id.count2);
+        sCountText2.setText(String.valueOf(Env.count2));
+        EditText sCountText3 = (EditText)findViewById(R.id.count3);
+        sCountText3.setText(String.valueOf(Env.count3));
+
 
         EditText wakeupText = (EditText)findViewById(R.id.wakeupTimeInput);
         wakeupText.setText(String.valueOf(Env.wakeupTime));
-
         EditText idleText = (EditText)findViewById(R.id.idleTimeInput);
         idleText.setText(String.valueOf(Env.idleTime));
 
@@ -171,8 +193,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void cancelManager() {
         Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
+        wakeupIntent.setAction("WAKEUP");
         PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
+        sleepIntent.setAction("SLEEP");
         PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
@@ -185,7 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
         //設定した日時で発行するIntentを生成
         Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
+        wakeupIntent.setAction("WAKEUP");
         PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         //日時と発行するIntentをAlarmManagerにセットします
         AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
@@ -194,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
         //設定した日時で発行するIntentを生成
         Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
+        sleepIntent.setAction("SLEEP");
         PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //日時と発行するIntentをAlarmManagerにセットします

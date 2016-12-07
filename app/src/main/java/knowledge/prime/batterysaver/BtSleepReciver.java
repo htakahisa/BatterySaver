@@ -18,7 +18,11 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
 
         String action = intent.getAction();
         if (action != null) {
-            return;
+            if (action.equals("SLEEP")) {
+                //ok
+            } else {
+                return;
+            }
         }
 
 
@@ -33,8 +37,10 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
 
     public void cancelManager(Context context) {
         Intent wakeupIntent = new Intent(context, BtReciver.class);
+        wakeupIntent.setAction("WAKEUP");
         PendingIntent wakeupSender = PendingIntent.getBroadcast(context, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Intent sleepIntent = new Intent(context, BtSleepReciver.class);
+        sleepIntent.setAction("SLEEP");
         PendingIntent sleepSender = PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
@@ -47,6 +53,7 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
 
         //設定した日時で発行するIntentを生成
         Intent wakeupIntent = new Intent(context, BtReciver.class);
+        wakeupIntent.setAction("WAKEUP");
         PendingIntent wakeupSender = PendingIntent.getBroadcast(context, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //日時と発行するIntentをAlarmManagerにセットします
@@ -56,6 +63,7 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
 
         //設定した日時で発行するIntentを生成
         Intent sleepIntent = new Intent(context, BtSleepReciver.class);
+        sleepIntent.setAction("SLEEP");
         PendingIntent sleepSender = PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //日時と発行するIntentをAlarmManagerにセットします

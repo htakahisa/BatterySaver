@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -16,7 +15,6 @@ import java.util.Calendar;
  * Created by takahisa007 on 11/30/16.
  */
 public class BtReciver extends WakefulBroadcastReceiver {
-
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -38,31 +36,39 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 // 画面OFF時
                 Log.d("screen", "SCREEN_OFF");
                 Env.isScreenOn = false;
-                cancelManager(context);
-                setManager(context, Calendar.getInstance());
+                Env.intervalType = 1;
+                Env.sleepCount = 0;
+                resetInterval(context);
                 return;
 
 
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-                //バッテリー接続時は ON のまま
-                int plugged = intent.getIntExtra("plugged", 0);
-                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
-                        ) {
-                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-                    Env.isPlugged = true;
-                } else {
-                    Log.d("plug", "plug is unplugged");
-                    Env.isPlugged = false;
-
-                }
+//                //バッテリー接続時は ON のまま
+//                int plugged = intent.getIntExtra("plugged", 0);
+//                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
+//                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
+//                        ) {
+//                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
+//                    Env.isPlugged = true;
+//                    Env.intervalType = 1;
+//                    count = 1;
+//                } else {
+//                    //バッテリーを外した時
+//                    Log.d("plug", "plug is unplugged");
+//                    Env.isPlugged = false;
+//
+//                }
+                Env.isPlugged = false;
                 return;
-            } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)){
+            } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)) {
                 //起動時は再設定
                 Intent intentActivity = new Intent(context, MainActivity.class);
                 intentActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intentActivity);
                 return;
+            } else if(action.equals("WAKEUP")) {
+                Log.d("intent", "WAKEUP intent. count:" + Env.sleepCount +" and then +1");
+                Env.sleepCount++;
             } else {
                 Log.d("intent", action);
                 return;
@@ -72,14 +78,80 @@ public class BtReciver extends WakefulBroadcastReceiver {
         Intent serviceIntent = new Intent(context,BtService.class);
         serviceIntent.setAction(intent.getAction());
 
+        // 再設定が必要なら設定する
+        if (needToChangeNextType()) {
+            resetInterval(context);
+            return;
+        }
         // サービス起動
         startWakefulService(context,serviceIntent);
+
+    }
+
+    private boolean needToChangeNextType() {
+
+        //画面がON の時は設定の変更不要
+        if (Env.isScreenOn) {
+            return false;
+        }
+
+        long maxCount = 0;
+        if (Env.intervalType == 1) {
+            maxCount = Env.count;
+        }
+        if (Env.intervalType == 2) {
+            maxCount = Env.count2;
+        }
+        if (Env.intervalType == 3) {
+            maxCount = Env.count3;
+        }
+        if (Env.intervalType == 4) {
+            return false;//変更の必要はなし
+        }
+        if (Env.sleepCount > maxCount) {
+            Log.d("count", "sleepCount:" + Env.sleepCount + ", maxCount:" + maxCount);
+            if (Env.intervalType < 4) {
+                Env.intervalType = Env.intervalType + 1;
+            }
+            Env.sleepCount = 0;
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+
+    private void resetInterval(Context context) {
+        long sleepTime = 300000; //初期値は安全のため 5分
+        long wakeupTime = Env.wakeupTime;
+
+        switch (Env.intervalType) {
+            case 1:
+                sleepTime = Env.sleepTime;
+                break;
+            case 2:
+                sleepTime = Env.sleepTime2;
+                break;
+            case 3:
+                sleepTime = Env.sleepTime3;
+                break;
+            case 4:
+                sleepTime = Env.sleepTime4;
+                break;
+        }
+
+        cancelManager(context);
+        setManager(context, Calendar.getInstance(), sleepTime, wakeupTime);
+
     }
 
     public void cancelManager(Context context) {
         Intent wakeupIntent = new Intent(context, BtReciver.class);
+        wakeupIntent.setAction("WAKEUP");
         PendingIntent wakeupSender = PendingIntent.getBroadcast(context, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Intent sleepIntent = new Intent(context, BtSleepReciver.class);
+        sleepIntent.setAction("SLEEP");
         PendingIntent sleepSender = PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
@@ -87,24 +159,26 @@ public class BtReciver extends WakefulBroadcastReceiver {
         manager.cancel(sleepSender);
     }
 
-    public void setManager(Context context, Calendar triggerTime) {
+    public void setManager(Context context, Calendar triggerTime, long sleepTime, long wakeupTime) {
         // alermManager設定
 
         //設定した日時で発行するIntentを生成
         Intent wakeupIntent = new Intent(context, BtReciver.class);
+        wakeupIntent.setAction("WAKEUP");
         PendingIntent wakeupSender = PendingIntent.getBroadcast(context, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //日時と発行するIntentをAlarmManagerにセットします
         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), sleepTime + wakeupTime, wakeupSender);
 
 
         //設定した日時で発行するIntentを生成
         Intent sleepIntent = new Intent(context, BtSleepReciver.class);
+        sleepIntent.setAction("SLEEP");
         PendingIntent sleepSender = PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //日時と発行するIntentをAlarmManagerにセットします
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + wakeupTime, sleepTime + wakeupTime, sleepSender);
 
 
     }

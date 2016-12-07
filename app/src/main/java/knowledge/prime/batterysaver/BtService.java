@@ -25,12 +25,12 @@ public class BtService extends IntentService {
 
         try {
 
-            Log.d("call", "RECIVE wakeup, wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
+            Log.d("call", "RECIVE wakeup, type:"+Env.intervalType+", wakeup:" + Env.wakeupTime + ", idle:" + Env.idleTime);
 
 
 
             //
-            if (Env.isPlugged) {
+            if (Env.isPlugged && !Env.isDebug) {
                 Log.d("plug", "always on, because charging");
                 WifiHandler.isConnect(BtService.this, true);
                 isConnectMobile(true);
