@@ -1,11 +1,11 @@
 package knowledge.prime.batterysaver;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -43,22 +43,22 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
 
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-//                //バッテリー接続時は ON のまま
-//                int plugged = intent.getIntExtra("plugged", 0);
-//                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-//                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
-//                        ) {
-//                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-//                    Env.isPlugged = true;
-//                    Env.intervalType = 1;
-//                    count = 1;
-//                } else {
-//                    //バッテリーを外した時
-//                    Log.d("plug", "plug is unplugged");
-//                    Env.isPlugged = false;
-//
-//                }
-                Env.isPlugged = false;
+                //バッテリー接続時は ON のまま
+                int plugged = intent.getIntExtra("plugged", 0);
+                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
+                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
+                        ) {
+                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
+                    Env.isPlugged = true;
+                    Env.intervalType = 1;
+                    Env.sleepCount = 0;
+                } else {
+                    //バッテリーを外した時
+                    Log.d("plug", "plug is unplugged");
+                    Env.isPlugged = false;
+
+                }
+//                Env.isPlugged = false;
                 return;
             } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)) {
                 //起動時は再設定
@@ -141,47 +141,14 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 break;
         }
 
-        cancelManager(context);
-        setManager(context, Calendar.getInstance(), sleepTime, wakeupTime);
+        AlarmManagerHandler.cancelSchedule(context);
+        AlarmManagerHandler.setSchedule(context, Calendar.getInstance(), sleepTime, wakeupTime);
 
     }
 
-    public void cancelManager(Context context) {
-        Intent wakeupIntent = new Intent(context, BtReciver.class);
-        wakeupIntent.setAction("WAKEUP");
-        PendingIntent wakeupSender = PendingIntent.getBroadcast(context, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Intent sleepIntent = new Intent(context, BtSleepReciver.class);
-        sleepIntent.setAction("SLEEP");
-        PendingIntent sleepSender = PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        manager.cancel(wakeupSender);
-        manager.cancel(sleepSender);
-    }
-
-    public void setManager(Context context, Calendar triggerTime, long sleepTime, long wakeupTime) {
-        // alermManager設定
-
-        //設定した日時で発行するIntentを生成
-        Intent wakeupIntent = new Intent(context, BtReciver.class);
-        wakeupIntent.setAction("WAKEUP");
-        PendingIntent wakeupSender = PendingIntent.getBroadcast(context, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //日時と発行するIntentをAlarmManagerにセットします
-        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), sleepTime + wakeupTime, wakeupSender);
 
 
-        //設定した日時で発行するIntentを生成
-        Intent sleepIntent = new Intent(context, BtSleepReciver.class);
-        sleepIntent.setAction("SLEEP");
-        PendingIntent sleepSender = PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //日時と発行するIntentをAlarmManagerにセットします
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + wakeupTime, sleepTime + wakeupTime, sleepSender);
-
-
-    }
 
 
     private void setNotification(Context context) {

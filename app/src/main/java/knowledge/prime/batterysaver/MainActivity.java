@@ -1,6 +1,5 @@
 package knowledge.prime.batterysaver;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -32,17 +31,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Env.sleepTime   =  60000;
-        Env.sleepTime2  = 300000;
-        Env.sleepTime3  = 600000;
-        Env.sleepTime4  = 900000;
+//        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = data.edit();
+//        editor.clear();
+//        editor.commit();
 
-        Env.wakeupTime =   60000;
-        Env.idleTime   =   60000;
+        Env.sleepTime   = PropertyUtils.getProperty(MainActivity.this, "sleepTime", 60000);
+        Env.sleepTime2  = PropertyUtils.getProperty(MainActivity.this, "sleepTime2", 300000);
+        Env.sleepTime3  = PropertyUtils.getProperty(MainActivity.this, "sleepTime3", 600000);
+        Env.sleepTime4  = PropertyUtils.getProperty(MainActivity.this, "sleepTime4", 900000);
 
-        Env.count = 1;
-        Env.count2 = 3;
-        Env.count3 = 3;
+        Env.wakeupTime = PropertyUtils.getProperty(MainActivity.this, "wakeupTime", 60000);
+        Env.idleTime   = PropertyUtils.getProperty(MainActivity.this, "idleTime", 60000);
+
+        Env.count  = PropertyUtils.getProperty(MainActivity.this, "count", 1);
+        Env.count2 = PropertyUtils.getProperty(MainActivity.this, "count2", 3);
+        Env.count3 = PropertyUtils.getProperty(MainActivity.this, "count3", 3);
 
         Env.intervalType = 1;
 
@@ -70,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         idleText.setText(String.valueOf(Env.idleTime));
 
         //alermmanager setting
-        this.setManager(Calendar.getInstance());
+        AlarmManagerHandler.setSchedule(MainActivity.this, Calendar.getInstance(), Env.sleepTime, Env.wakeupTime);
 
         //スクリーンの状態 on/off
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -95,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         //通知アイコン設定
         this.setNotification();
 
-        Log.d("time", "wakeup:" + Env.wakeupTime + ", sleep:" + Env.sleepTime + ", idle:" + Env.idleTime);
     }
 
     /**
@@ -178,11 +181,11 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     Calendar triggerTime = Calendar.getInstance();
-                    setManager(triggerTime);
+                    AlarmManagerHandler.setSchedule(MainActivity.this, triggerTime, Env.sleepTime, Env.wakeupTime);
                     setNotification();
                     Log.d("call", "start called");
                 } else {
-                    cancelManager();
+                    AlarmManagerHandler.cancelSchedule(MainActivity.this);
                     Env.isStop = true;
                     deleteNotification();
                     Log.d("call", "stop called");
@@ -191,43 +194,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void cancelManager() {
-        Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
-        wakeupIntent.setAction("WAKEUP");
-        PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
-        sleepIntent.setAction("SLEEP");
-        PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        manager.cancel(wakeupSender);
-        manager.cancel(sleepSender);
-    }
-
-    public void setManager(Calendar triggerTime) {
-        // alermManager設定
-
-        //設定した日時で発行するIntentを生成
-        Intent wakeupIntent = new Intent(MainActivity.this, BtReciver.class);
-        wakeupIntent.setAction("WAKEUP");
-        PendingIntent wakeupSender = PendingIntent.getBroadcast(MainActivity.this, 0, wakeupIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        //日時と発行するIntentをAlarmManagerにセットします
-        AlarmManager manager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis(), Env.sleepTime + Env.wakeupTime, wakeupSender);
-
-
-        //設定した日時で発行するIntentを生成
-        Intent sleepIntent = new Intent(MainActivity.this, BtSleepReciver.class);
-        sleepIntent.setAction("SLEEP");
-        PendingIntent sleepSender = PendingIntent.getBroadcast(MainActivity.this, 0, sleepIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //日時と発行するIntentをAlarmManagerにセットします
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime.getTimeInMillis() + Env.wakeupTime, Env.wakeupTime + Env.sleepTime, sleepSender);
-
-
-    }
 
     private void setNotification() {
         NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -251,4 +217,49 @@ public class MainActivity extends AppCompatActivity {
         NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(1);
     }
+
+    @Override
+    protected void onStop() {
+
+
+        //終了前に値の保存
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime", Env.sleepTime);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime2", Env.sleepTime2);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime3", Env.sleepTime3);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime4", Env.sleepTime4);
+
+        PropertyUtils.setProperty(MainActivity.this, "wakeupTime", Env.wakeupTime);
+        PropertyUtils.setProperty(MainActivity.this, "idleTime", Env.idleTime);
+
+        PropertyUtils.setProperty(MainActivity.this, "count", Env.count);
+        PropertyUtils.setProperty(MainActivity.this, "count2", Env.count2);
+        PropertyUtils.setProperty(MainActivity.this, "count3", Env.count3);
+
+        Log.d("end", "onStop called.");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        //終了前に値の保存
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime", Env.sleepTime);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime2", Env.sleepTime2);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime3", Env.sleepTime3);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime4", Env.sleepTime4);
+
+        PropertyUtils.setProperty(MainActivity.this, "wakeupTime", Env.wakeupTime);
+        PropertyUtils.setProperty(MainActivity.this, "idleTime", Env.idleTime);
+
+        PropertyUtils.setProperty(MainActivity.this, "count", Env.count);
+        PropertyUtils.setProperty(MainActivity.this, "count2", Env.count2);
+        PropertyUtils.setProperty(MainActivity.this, "count3", Env.count3);
+
+        deleteNotification();
+
+        Log.d("end", "onDestroy called.");
+        super.onDestroy();
+    }
+
+
 }

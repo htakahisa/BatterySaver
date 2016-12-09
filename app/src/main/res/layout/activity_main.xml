@@ -36,7 +36,7 @@
                 android:inputType="number"
                 android:ems="5"
                 android:id="@+id/sleepTimeInput"
-                android:enabled="false" />
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -76,7 +76,7 @@
                 android:inputType="number"
                 android:ems="5"
                 android:id="@+id/sleepTimeInput2"
-                android:enabled="false" />
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -116,7 +116,7 @@
                 android:inputType="number"
                 android:ems="5"
                 android:id="@+id/sleepTimeInput3"
-                android:enabled="false" />
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -155,7 +155,7 @@
                 android:inputType="number"
                 android:ems="10"
                 android:id="@+id/sleepTimeInput4"
-                android:enabled="false" />
+                />
 
         </LinearLayout>
 
