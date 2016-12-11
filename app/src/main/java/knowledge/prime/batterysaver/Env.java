@@ -21,6 +21,12 @@ public class Env {
 
     //type 4
     public static long sleepTime4;
+    public static long count4;
+
+    //type 5
+    public static long sleepTime5;
+    public static long fromH;
+    public static long toH;
 
     public static boolean isStop;
 
@@ -34,7 +40,7 @@ public class Env {
     public static boolean isDebug = false;
 
     public static long sleepCount = 0;
-    // 1, 2, 3, 4
+    // 1, 2, 3, 4, 5
     public static int intervalType = 1;
 
     public static long getSleepTime() {
@@ -43,6 +49,7 @@ public class Env {
             case 2: return sleepTime2;
             case 3: return sleepTime3;
             case 4: return sleepTime4;
+            case 5: return sleepTime5;
         }
         return 0;
     }

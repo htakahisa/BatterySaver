@@ -25,7 +25,7 @@ public class BtService extends IntentService {
 
         try {
 
-            Log.d("call", "RECIVE wakeup, type:"+Env.intervalType+", wakeup:" + Env.wakeupTime + ", idle:" + Env.idleTime);
+            Log.d("call", "RECIVE wakeup, type:"+Env.intervalType+", wakeup:" + Env.wakeupTime + ", idleTime:" + Env.idleTime);
 
 
 

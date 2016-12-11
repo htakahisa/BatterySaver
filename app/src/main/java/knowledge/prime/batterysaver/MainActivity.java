@@ -1,17 +1,16 @@
 package knowledge.prime.batterysaver;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -31,47 +30,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = data.edit();
-//        editor.clear();
-//        editor.commit();
-
-        Env.sleepTime   = PropertyUtils.getProperty(MainActivity.this, "sleepTime", 60000);
-        Env.sleepTime2  = PropertyUtils.getProperty(MainActivity.this, "sleepTime2", 300000);
-        Env.sleepTime3  = PropertyUtils.getProperty(MainActivity.this, "sleepTime3", 600000);
-        Env.sleepTime4  = PropertyUtils.getProperty(MainActivity.this, "sleepTime4", 900000);
-
-        Env.wakeupTime = PropertyUtils.getProperty(MainActivity.this, "wakeupTime", 60000);
-        Env.idleTime   = PropertyUtils.getProperty(MainActivity.this, "idleTime", 60000);
-
-        Env.count  = PropertyUtils.getProperty(MainActivity.this, "count", 1);
-        Env.count2 = PropertyUtils.getProperty(MainActivity.this, "count2", 3);
-        Env.count3 = PropertyUtils.getProperty(MainActivity.this, "count3", 3);
-
-        Env.intervalType = 1;
-
-        //初期値のセット
-        EditText sleepText = (EditText)findViewById(R.id.sleepTimeInput);
-        sleepText.setText(String.valueOf(Env.sleepTime));
-        EditText sleepText2 = (EditText)findViewById(R.id.sleepTimeInput2);
-        sleepText2.setText(String.valueOf(Env.sleepTime2));
-        EditText sleepText3 = (EditText)findViewById(R.id.sleepTimeInput3);
-        sleepText3.setText(String.valueOf(Env.sleepTime3));
-        EditText sleepText4 = (EditText)findViewById(R.id.sleepTimeInput4);
-        sleepText4.setText(String.valueOf(Env.sleepTime4));
-
-        EditText sCountText = (EditText)findViewById(R.id.count1);
-        sCountText.setText(String.valueOf(Env.count));
-        EditText sCountText2 = (EditText)findViewById(R.id.count2);
-        sCountText2.setText(String.valueOf(Env.count2));
-        EditText sCountText3 = (EditText)findViewById(R.id.count3);
-        sCountText3.setText(String.valueOf(Env.count3));
+        //設定値をプロパティから取得
+        initSetting();
+        //レイアウトのオブジェクトの値を更新
+        setInitLayoutValue();
 
 
-        EditText wakeupText = (EditText)findViewById(R.id.wakeupTimeInput);
-        wakeupText.setText(String.valueOf(Env.wakeupTime));
-        EditText idleText = (EditText)findViewById(R.id.idleTimeInput);
-        idleText.setText(String.valueOf(Env.idleTime));
+        Button reset = (Button)findViewById(R.id.resetButton);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //プロバティの値をクリア
+                SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = data.edit();
+                editor.clear();
+                editor.commit();
+                //メモリ上を初期値で初期化
+                initSetting();
+                //レイアウトも更新
+                setInitLayoutValue();
+            }
+        });
 
         //alermmanager setting
         AlarmManagerHandler.setSchedule(MainActivity.this, Calendar.getInstance(), Env.sleepTime, Env.wakeupTime);
@@ -97,8 +76,65 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(new BtReciver(), filter);
 
         //通知アイコン設定
-        this.setNotification();
+        NotificationHandler.setNotification(MainActivity.this);
 
+    }
+
+    private void setInitLayoutValue() {
+        //初期値のセット
+        EditText sleepText = (EditText)findViewById(R.id.sleepTimeInput);
+        sleepText.setText(String.valueOf(Env.sleepTime));
+        EditText sleepText2 = (EditText)findViewById(R.id.sleepTimeInput2);
+        sleepText2.setText(String.valueOf(Env.sleepTime2));
+        EditText sleepText3 = (EditText)findViewById(R.id.sleepTimeInput3);
+        sleepText3.setText(String.valueOf(Env.sleepTime3));
+        EditText sleepText4 = (EditText)findViewById(R.id.sleepTimeInput4);
+        sleepText4.setText(String.valueOf(Env.sleepTime4));
+        EditText sleepText5 = (EditText)findViewById(R.id.sleepTimeInput5);
+        sleepText5.setText(String.valueOf(Env.sleepTime5));
+
+        EditText sCountText = (EditText)findViewById(R.id.count1);
+        sCountText.setText(String.valueOf(Env.count));
+        EditText sCountText2 = (EditText)findViewById(R.id.count2);
+        sCountText2.setText(String.valueOf(Env.count2));
+        EditText sCountText3 = (EditText)findViewById(R.id.count3);
+        sCountText3.setText(String.valueOf(Env.count3));
+        EditText sCountText4 = (EditText)findViewById(R.id.count4);
+        sCountText4.setText(String.valueOf(Env.count4));
+
+        EditText wakeupText = (EditText)findViewById(R.id.wakeupTimeInput);
+        wakeupText.setText(String.valueOf(Env.wakeupTime));
+        EditText idleText = (EditText)findViewById(R.id.idleTimeInput);
+        idleText.setText(String.valueOf(Env.idleTime));
+
+        EditText fromH = (EditText)findViewById(R.id.fromH);
+        fromH.setText(String.valueOf(Env.fromH));
+        EditText toH = (EditText)findViewById(R.id.toH);
+        toH.setText(String.valueOf(Env.toH));
+    }
+
+    /**
+     * 初期化
+     */
+    private void initSetting() {
+        Env.sleepTime   = PropertyUtils.getProperty(MainActivity.this, "sleepTime", 60000);
+        Env.sleepTime2  = PropertyUtils.getProperty(MainActivity.this, "sleepTime2", 300000);
+        Env.sleepTime3  = PropertyUtils.getProperty(MainActivity.this, "sleepTime3", 600000);
+        Env.sleepTime4  = PropertyUtils.getProperty(MainActivity.this, "sleepTime4", 900000);
+        Env.sleepTime5  = PropertyUtils.getProperty(MainActivity.this, "sleepTime5", 1800000);
+
+        Env.fromH = PropertyUtils.getProperty(MainActivity.this, "fromH", 0);
+        Env.toH = PropertyUtils.getProperty(MainActivity.this, "toH", 7);
+
+        Env.wakeupTime = PropertyUtils.getProperty(MainActivity.this, "wakeupTime", 60000);
+        Env.idleTime   = PropertyUtils.getProperty(MainActivity.this, "idleTime", 60000);
+
+        Env.count  = PropertyUtils.getProperty(MainActivity.this, "count", 1);
+        Env.count2 = PropertyUtils.getProperty(MainActivity.this, "count2", 3);
+        Env.count3 = PropertyUtils.getProperty(MainActivity.this, "count3", 3);
+        Env.count4 = PropertyUtils.getProperty(MainActivity.this, "count4", 3);
+
+        Env.intervalType = 0;
     }
 
     /**
@@ -169,6 +205,41 @@ public class MainActivity extends AppCompatActivity {
                     if (sleepEditText.getText() != null) {
                         Env.sleepTime = Long.valueOf(sleepEditText.getText().toString()).longValue();
                     }
+                    EditText sleepEditText2 = (EditText) findViewById(R.id.sleepTimeInput2);
+                    if (sleepEditText2.getText() != null) {
+                        Env.sleepTime2 = Long.valueOf(sleepEditText2.getText().toString()).longValue();
+                    }
+                    EditText sleepEditText3 = (EditText) findViewById(R.id.sleepTimeInput3);
+                    if (sleepEditText3.getText() != null) {
+                        Env.sleepTime3 = Long.valueOf(sleepEditText3.getText().toString()).longValue();
+                    }
+                    EditText sleepEditText4 = (EditText) findViewById(R.id.sleepTimeInput4);
+                    if (sleepEditText4.getText() != null) {
+                        Env.sleepTime4 = Long.valueOf(sleepEditText4.getText().toString()).longValue();
+                    }
+                    EditText sleepEditText5 = (EditText) findViewById(R.id.sleepTimeInput5);
+                    if (sleepEditText5.getText() != null) {
+                        Env.sleepTime5 = Long.valueOf(sleepEditText5.getText().toString()).longValue();
+                    }
+
+                    //count
+                    EditText count1 = (EditText) findViewById(R.id.count1);
+                    if (count1.getText() != null) {
+                        Env.count = Long.valueOf(count1.getText().toString()).longValue();
+                    }
+                    EditText count2 = (EditText) findViewById(R.id.count2);
+                    if (count2.getText() != null) {
+                        Env.count2 = Long.valueOf(count2.getText().toString()).longValue();
+                    }
+                    EditText count3 = (EditText) findViewById(R.id.count3);
+                    if (count3.getText() != null) {
+                        Env.count3 = Long.valueOf(count3.getText().toString()).longValue();
+                    }
+                    EditText count4 = (EditText) findViewById(R.id.count4);
+                    if (count4.getText() != null) {
+                        Env.count4 = Long.valueOf(count4.getText().toString()).longValue();
+                    }
+
                     //wakeuptime
                     EditText wakeupEditText = (EditText) findViewById(R.id.wakeupTimeInput);
                     if (wakeupEditText.getText() != null) {
@@ -180,53 +251,41 @@ public class MainActivity extends AppCompatActivity {
                         Env.idleTime = Long.valueOf(idleEditText.getText().toString()).longValue();
                     }
 
+                    // from , to Hour
+                    EditText fromHText = (EditText) findViewById(R.id.fromH);
+                    if (fromHText.getText() != null) {
+                        Env.fromH = Long.valueOf(fromHText.getText().toString()).longValue();
+                    }
+                    EditText toHText = (EditText) findViewById(R.id.toH);
+                    if (toHText.getText() != null) {
+                        Env.toH = Long.valueOf(toHText.getText().toString()).longValue();
+                    }
+
                     Calendar triggerTime = Calendar.getInstance();
                     AlarmManagerHandler.setSchedule(MainActivity.this, triggerTime, Env.sleepTime, Env.wakeupTime);
-                    setNotification();
+                    NotificationHandler.setNotification(MainActivity.this);
                     Log.d("call", "start called");
                 } else {
                     AlarmManagerHandler.cancelSchedule(MainActivity.this);
                     Env.isStop = true;
-                    deleteNotification();
+                    NotificationHandler.deleteNotification(MainActivity.this);
                     Log.d("call", "stop called");
                 }
             }
         });
     }
 
-
-    private void setNotification() {
-        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                this, 0,
-                new Intent(this, MainActivity.class), 0);
-
-        Notification notif= new Notification.Builder(this)
-                .setContentTitle(getString(R.string.app_name))
-//                .setContentText("")
-                .setSmallIcon(R.drawable.status_bar_notification)
-                .setContentIntent(contentIntent)
-                .build();
-        //常駐させる
-        notif.flags = Notification.FLAG_ONGOING_EVENT;
-        nm.notify(1, notif);
-
-    }
-
-    private void deleteNotification() {
-        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        nm.cancel(1);
-    }
-
     @Override
     protected void onStop() {
-
+        super.onStop();
+        Log.d("end", "onStop called.");
 
         //終了前に値の保存
         PropertyUtils.setProperty(MainActivity.this, "sleepTime", Env.sleepTime);
         PropertyUtils.setProperty(MainActivity.this, "sleepTime2", Env.sleepTime2);
         PropertyUtils.setProperty(MainActivity.this, "sleepTime3", Env.sleepTime3);
         PropertyUtils.setProperty(MainActivity.this, "sleepTime4", Env.sleepTime4);
+        PropertyUtils.setProperty(MainActivity.this, "sleepTime5", Env.sleepTime5);
 
         PropertyUtils.setProperty(MainActivity.this, "wakeupTime", Env.wakeupTime);
         PropertyUtils.setProperty(MainActivity.this, "idleTime", Env.idleTime);
@@ -234,31 +293,19 @@ public class MainActivity extends AppCompatActivity {
         PropertyUtils.setProperty(MainActivity.this, "count", Env.count);
         PropertyUtils.setProperty(MainActivity.this, "count2", Env.count2);
         PropertyUtils.setProperty(MainActivity.this, "count3", Env.count3);
+        PropertyUtils.setProperty(MainActivity.this, "count4", Env.count4);
 
-        Log.d("end", "onStop called.");
-        super.onStop();
+        PropertyUtils.setProperty(MainActivity.this, "fromH", Env.fromH);
+        PropertyUtils.setProperty(MainActivity.this, "toH", Env.toH);
     }
 
     @Override
     protected void onDestroy() {
-
-        //終了前に値の保存
-        PropertyUtils.setProperty(MainActivity.this, "sleepTime", Env.sleepTime);
-        PropertyUtils.setProperty(MainActivity.this, "sleepTime2", Env.sleepTime2);
-        PropertyUtils.setProperty(MainActivity.this, "sleepTime3", Env.sleepTime3);
-        PropertyUtils.setProperty(MainActivity.this, "sleepTime4", Env.sleepTime4);
-
-        PropertyUtils.setProperty(MainActivity.this, "wakeupTime", Env.wakeupTime);
-        PropertyUtils.setProperty(MainActivity.this, "idleTime", Env.idleTime);
-
-        PropertyUtils.setProperty(MainActivity.this, "count", Env.count);
-        PropertyUtils.setProperty(MainActivity.this, "count2", Env.count2);
-        PropertyUtils.setProperty(MainActivity.this, "count3", Env.count3);
-
-        deleteNotification();
-
-        Log.d("end", "onDestroy called.");
         super.onDestroy();
+        Log.d("end", "onDestroy called.");
+
+        NotificationHandler.deleteNotification(MainActivity.this);
+
     }
 
 

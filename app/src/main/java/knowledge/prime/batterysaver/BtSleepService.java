@@ -22,7 +22,7 @@ public class BtSleepService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            Log.d("call", "RECIVE sleep, type:" + Env.intervalType + ", wakeup:" + Env.wakeupTime + ", sleep:" + Env.getSleepTime() + ", idle:" + Env.idleTime);
+            Log.d("call", "RECIVE sleep, type:" + Env.intervalType + ", wakeup:" + Env.wakeupTime + ", sleep:" + Env.getSleepTime());
 
             if (Env.isStop) {
                 Log.d("s", "stoped.");

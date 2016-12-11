@@ -1,15 +1,14 @@
 package knowledge.prime.batterysaver;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by takahisa007 on 11/30/16.
@@ -36,7 +35,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 // 画面OFF時
                 Log.d("screen", "SCREEN_OFF");
                 Env.isScreenOn = false;
-                Env.intervalType = 1;
+                Env.intervalType = 0;
                 Env.sleepCount = 0;
                 resetInterval(context);
                 return;
@@ -50,7 +49,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
                         ) {
                     Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
                     Env.isPlugged = true;
-                    Env.intervalType = 1;
+                    Env.intervalType = 0;
                     Env.sleepCount = 0;
                 } else {
                     //バッテリーを外した時
@@ -88,6 +87,8 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
     }
 
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("H");
+
     private boolean needToChangeNextType() {
 
         //画面がON の時は設定の変更不要
@@ -96,6 +97,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
         }
 
         long maxCount = 0;
+        if (Env.intervalType == 0) {
+            maxCount = 1;
+        }
         if (Env.intervalType == 1) {
             maxCount = Env.count;
         }
@@ -106,19 +110,42 @@ public class BtReciver extends WakefulBroadcastReceiver {
             maxCount = Env.count3;
         }
         if (Env.intervalType == 4) {
-            return false;//変更の必要はなし
+            maxCount = Env.count4;
         }
+        if (Env.intervalType == 5) {
+            //指定時間外の場合は直ちに type4 に戻す
+            Date now = new Date();
+            long nowHour = Long.valueOf(sdf.format(now.getTime()));
+            if (Env.fromH <= nowHour && nowHour < Env.toH) {
+                return false; //時間内は何もしない
+            } else {
+                Env.intervalType = 4;
+                Env.sleepCount = 0;
+                return true;
+            }
+        }
+
         if (Env.sleepCount > maxCount) {
             Log.d("count", "sleepCount:" + Env.sleepCount + ", maxCount:" + maxCount);
             if (Env.intervalType < 4) {
                 Env.intervalType = Env.intervalType + 1;
+                Env.sleepCount = 0;
+                return true;
             }
-            Env.sleepCount = 0;
-            return true;
-
+            if (Env.intervalType == 4) {// type4 の時は時間帯によって type 5に変更
+                Date now = new Date();
+                long nowHour = Long.valueOf(sdf.format(now.getTime()));
+                if (Env.fromH <= nowHour && nowHour < Env.toH) {
+                    Env.intervalType = 5;
+                    Env.sleepCount = 0;
+                    return true;
+                }
+            }
         } else {
             return false;
         }
+
+        return false;
     }
 
 
@@ -127,6 +154,10 @@ public class BtReciver extends WakefulBroadcastReceiver {
         long wakeupTime = Env.wakeupTime;
 
         switch (Env.intervalType) {
+            case 0:
+                wakeupTime = Env.idleTime;
+                sleepTime = Env.sleepTime;
+                break;
             case 1:
                 sleepTime = Env.sleepTime;
                 break;
@@ -139,6 +170,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
             case 4:
                 sleepTime = Env.sleepTime4;
                 break;
+            case 5:
+                sleepTime = Env.sleepTime5;
+                break;
         }
 
         AlarmManagerHandler.cancelSchedule(context);
@@ -146,26 +180,4 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
     }
 
-
-
-
-
-
-    private void setNotification(Context context) {
-        NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                context, 0,
-                new Intent(context, MainActivity.class), 0);
-
-        Notification notif= new Notification.Builder(context)
-                .setContentTitle(context.getString(R.string.app_name))
-//                .setContentText("")
-                .setSmallIcon(R.drawable.status_bar_notification)
-                .setContentIntent(contentIntent)
-                .build();
-        //常駐させる
-        notif.flags = Notification.FLAG_ONGOING_EVENT;
-        nm.notify(1, notif);
-
-    }
 }
