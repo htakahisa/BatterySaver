@@ -270,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
                     Env.isStop = true;
                     NotificationHandler.deleteNotification(MainActivity.this);
                     Log.d("call", "stop called");
+
                 }
             }
         });

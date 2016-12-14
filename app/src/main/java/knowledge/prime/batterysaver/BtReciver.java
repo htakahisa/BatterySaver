@@ -155,8 +155,8 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
         switch (Env.intervalType) {
             case 0:
-                wakeupTime = Env.idleTime;
                 sleepTime = Env.sleepTime;
+                wakeupTime = Env.idleTime;
                 break;
             case 1:
                 sleepTime = Env.sleepTime;
