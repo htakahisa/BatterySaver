@@ -31,6 +31,7 @@
         <receiver android:name=".BtSleepReciver">
         </receiver>
 
+        <service android:name=".MainService" />
         <service android:name=".BtService" />
         <service android:name=".BtSleepService" />
         <activity android:name=".MainActivity"

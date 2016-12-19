@@ -14,9 +14,23 @@ public class NotificationHandler {
 
     public static void setNotification(Context context) {
         NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification notif= getNotification(context);
+        //常駐させる
+        notif.flags = Notification.FLAG_ONGOING_EVENT;
+        nm.notify(Env.NOTIFICATION_ID, notif);
+
+    }
+
+    public static void deleteNotification(Context context) {
+        NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(1);
+    }
+
+    public static Notification getNotification(Context context) {
         PendingIntent contentIntent = PendingIntent.getActivity(
                 context, 0,
-                new Intent(context, MainActivity.class), 0);
+                new Intent(context, MainService.class), 0);
 
         Notification notif= new Notification.Builder(context)
                 .setContentTitle(context.getString(R.string.app_name))
@@ -24,14 +38,6 @@ public class NotificationHandler {
                 .setSmallIcon(R.drawable.status_bar_notif2)
                 .setContentIntent(contentIntent)
                 .build();
-        //常駐させる
-        notif.flags = Notification.FLAG_ONGOING_EVENT;
-        nm.notify(1, notif);
-
-    }
-
-    public static void deleteNotification(Context context) {
-        NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancel(1);
+        return notif;
     }
 }

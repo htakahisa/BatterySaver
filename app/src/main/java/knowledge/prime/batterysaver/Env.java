@@ -53,5 +53,7 @@ public class Env {
         }
         return 0;
     }
+
+    public static final int NOTIFICATION_ID = 1;
 }
 

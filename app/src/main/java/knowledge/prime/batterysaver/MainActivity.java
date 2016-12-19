@@ -2,7 +2,6 @@ package knowledge.prime.batterysaver;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
         initSetting();
         //レイアウトのオブジェクトの値を更新
         setInitLayoutValue();
-
 
         Button reset = (Button)findViewById(R.id.resetButton);
         reset.setOnClickListener(new View.OnClickListener() {
@@ -52,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //alermmanager setting
-        AlarmManagerHandler.setSchedule(MainActivity.this, Calendar.getInstance(), Env.sleepTime, Env.wakeupTime);
-
         //スクリーンの状態 on/off
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         Env.isScreenOn= pm.isScreenOn();
@@ -65,18 +59,17 @@ public class MainActivity extends AppCompatActivity {
         //Logcat イベントの設定
         setLogcatEvent();
 
+
+
         //初期化
         WifiHandler.init((WifiManager)getSystemService(WIFI_SERVICE));
 
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        filter.addAction(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(new BtReciver(), filter);
-
-        //通知アイコン設定
-        NotificationHandler.setNotification(MainActivity.this);
+        /** ONがチェックされていたら サービス開始 */
+        Switch onOff = (Switch)findViewById(R.id.onoff);
+        if (onOff.isChecked()) {
+            Intent intent = new Intent(getApplication(), MainService.class);
+            startService(intent);
+        }
 
     }
 
@@ -198,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isOn) {
                 if (isOn) {
-                    Env.isStop = false;
 
                     //sleeptime
                     EditText sleepEditText = (EditText) findViewById(R.id.sleepTimeInput);
@@ -261,16 +253,18 @@ public class MainActivity extends AppCompatActivity {
                         Env.toH = Long.valueOf(toHText.getText().toString()).longValue();
                     }
 
-                    Calendar triggerTime = Calendar.getInstance();
-                    AlarmManagerHandler.setSchedule(MainActivity.this, triggerTime, Env.sleepTime, Env.wakeupTime);
-                    NotificationHandler.setNotification(MainActivity.this);
+
                     Log.d("call", "start called");
+
+                    Intent intent = new Intent(getApplication(), MainService.class);
+                    startService(intent);
                 } else {
-                    AlarmManagerHandler.cancelSchedule(MainActivity.this);
-                    Env.isStop = true;
-                    NotificationHandler.deleteNotification(MainActivity.this);
+
+
                     Log.d("call", "stop called");
 
+                    Intent intent = new Intent(getApplication(), MainService.class);
+                    stopService(intent);
                 }
             }
         });
@@ -298,14 +292,14 @@ public class MainActivity extends AppCompatActivity {
 
         PropertyUtils.setProperty(MainActivity.this, "fromH", Env.fromH);
         PropertyUtils.setProperty(MainActivity.this, "toH", Env.toH);
+        PropertyUtils.setProperty(MainActivity.this, "intervalType", Env.intervalType);
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d("end", "onDestroy called.");
-
-        NotificationHandler.deleteNotification(MainActivity.this);
 
     }
 
