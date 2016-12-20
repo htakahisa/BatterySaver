@@ -1,5 +1,8 @@
 package knowledge.prime.batterysaver;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by takahisa007 on 11/30/16.
  */
@@ -55,5 +58,8 @@ public class Env {
     }
 
     public static final int NOTIFICATION_ID = 1;
+
+    public static Set<String> wifiCellIdSet = new HashSet<String>();
+
 }
 

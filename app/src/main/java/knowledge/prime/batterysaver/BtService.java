@@ -29,7 +29,7 @@ public class BtService extends IntentService {
 
 
 
-            //
+            //充電中は常にON
             if (Env.isPlugged && !Env.isDebug) {
                 Log.d("plug", "always on, because charging");
                 WifiHandler.isConnect(BtService.this, true);
@@ -41,7 +41,7 @@ public class BtService extends IntentService {
             //画面がONの時は常に wakeup
             if (Env.isScreenOn && !Env.isDebug) {
                 Log.d("screen", "always wake up because screen on.");
-                WifiHandler.isConnect(BtService.this, true);
+                this.wakeUpWifiRestrictedArea();
                 isConnectMobile(true);
                 return;
             }
@@ -49,7 +49,7 @@ public class BtService extends IntentService {
 
             //まずは設定 ON (すでに ON なら何もしない)
             Log.d("d", "wakeup");
-            WifiHandler.isConnect(BtService.this, true);
+            this.wakeUpWifiRestrictedArea();
             isConnectMobile(true);
 
 
@@ -59,7 +59,18 @@ public class BtService extends IntentService {
         }
     }
 
-
+    /**
+     * 指定場所では WIFI ON
+     */
+    private void wakeUpWifiRestrictedArea() {
+        for (String cellId : CellInfoHandler.getCellId(BtService.this)) {
+            //指定場所なら WI-FI ON
+            if (Env.wifiCellIdSet.contains(cellId)) {
+                WifiHandler.isConnect(BtService.this, true);
+                Log.d("cellId", "wifi on. Restricted area.");
+            }
+        }
+    }
 
     private void isConnectMobile(boolean isConnect) {
         try {

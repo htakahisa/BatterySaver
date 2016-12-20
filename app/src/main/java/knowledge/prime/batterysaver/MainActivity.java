@@ -18,7 +18,9 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         //Logcat イベントの設定
         setLogcatEvent();
 
+        //cellId 追加ボタンイベントの設定
+        setCellIdEvent();
 
 
         //初期化
@@ -72,6 +76,49 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    /**
+     * CellId ボタンを押した時に既存の CellId をプロパティにセットします。
+     */
+    private void setCellIdEvent() {
+
+        Button cellIdBtn = (Button)findViewById(R.id.cellIdButton);
+        cellIdBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //既存のデータ取得
+                String cellIdStr = PropertyUtils.getProperty(MainActivity.this, "cellIds", "");
+                Set<String> cellIdSet = new HashSet<>();
+                for(String s : cellIdStr.split(",")){
+                    cellIdSet.add(s);
+                }
+
+                //現在のCellId取得
+                cellIdSet.addAll(CellInfoHandler.getCellId(MainActivity.this));
+
+                //プロパティに登録
+                StringBuilder sb = new StringBuilder();
+                for (String s : cellIdSet) {
+                    if (sb.length() > 0) {
+                        sb.append(",");
+                    }
+                    sb.append(s);
+                }
+                PropertyUtils.setProperty(MainActivity.this, "cellIds", sb.toString());
+
+                //メモリも更新
+                Env.wifiCellIdSet = cellIdSet;
+
+                Log.d("cellId", "cellId:" + sb.toString());
+            }
+        });
+
+    }
+
+
+
+
 
     private void setInitLayoutValue() {
         //初期値のセット
@@ -126,6 +173,13 @@ public class MainActivity extends AppCompatActivity {
         Env.count2 = PropertyUtils.getProperty(MainActivity.this, "count2", 3);
         Env.count3 = PropertyUtils.getProperty(MainActivity.this, "count3", 3);
         Env.count4 = PropertyUtils.getProperty(MainActivity.this, "count4", 3);
+
+        String cellIds = PropertyUtils.getProperty(MainActivity.this, "cellIds", "");
+        Set<String> cellIdSet = new HashSet<>();
+        for (String s : cellIds.split(",")) {
+            cellIdSet.add(s);
+        }
+        Env.wifiCellIdSet = cellIdSet;
 
         Env.intervalType = 0;
     }
