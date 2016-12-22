@@ -309,6 +309,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Log.d("call", "start called");
+                    saveProperty();
 
                     Intent intent = new Intent(getApplication(), MainService.class);
                     startService(intent);
@@ -316,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Log.d("call", "stop called");
-
+                    saveProperty();
                     Intent intent = new Intent(getApplication(), MainService.class);
                     stopService(intent);
                 }
@@ -329,6 +330,11 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.d("end", "onStop called.");
 
+        saveProperty();
+
+    }
+
+    private void saveProperty() {
         //終了前に値の保存
         PropertyUtils.setProperty(MainActivity.this, "sleepTime", Env.sleepTime);
         PropertyUtils.setProperty(MainActivity.this, "sleepTime2", Env.sleepTime2);
@@ -347,7 +353,6 @@ public class MainActivity extends AppCompatActivity {
         PropertyUtils.setProperty(MainActivity.this, "fromH", Env.fromH);
         PropertyUtils.setProperty(MainActivity.this, "toH", Env.toH);
         PropertyUtils.setProperty(MainActivity.this, "intervalType", Env.intervalType);
-
     }
 
     @Override

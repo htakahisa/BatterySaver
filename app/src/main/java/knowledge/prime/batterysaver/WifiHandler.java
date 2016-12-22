@@ -2,6 +2,7 @@ package knowledge.prime.batterysaver;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 /**
  * Created by takahisa007 on 11/28/16.
@@ -15,6 +16,7 @@ public class WifiHandler {
     }
 
     public static void isConnect(Context context, boolean is) {
+        Env.isWifiWakeTime = is;
 
         if (wifi == null) {
             wifi = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
@@ -26,6 +28,8 @@ public class WifiHandler {
         }
 
         wifi.setWifiEnabled(is);
+
+        Log.d("connect", "wifi is " + is);
     }
 
 

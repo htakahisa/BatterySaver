@@ -1,5 +1,7 @@
 package knowledge.prime.batterysaver;
 
+import android.content.Context;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,6 +9,8 @@ import java.util.Set;
  * Created by takahisa007 on 11/30/16.
  */
 public class Env {
+
+    public static Context context;
 
     //type 1
     public static long sleepTime;
@@ -61,5 +65,11 @@ public class Env {
 
     public static Set<String> wifiCellIdSet = new HashSet<String>();
 
+    public static boolean isNetworkChanged;
+
+    public static boolean isMobileWakeTime;
+    public static boolean isWifiWakeTime;
+
+    public static int wifiCount = 0;
 }
 

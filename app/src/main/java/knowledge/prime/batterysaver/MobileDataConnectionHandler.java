@@ -2,6 +2,7 @@ package knowledge.prime.batterysaver;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,6 +15,7 @@ public class MobileDataConnectionHandler {
 
     public static void toConnectMobile(Context context, boolean isConnect) {
         try {
+            Env.isMobileWakeTime = isConnect;
             final ConnectivityManager conman = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             final Class<?> conmanClass = Class.forName(conman.getClass().getName());
             final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
@@ -25,6 +27,7 @@ public class MobileDataConnectionHandler {
 
             setMobileDataEnabledMethod.invoke(iConnectivityManager, isConnect);
 
+            Log.d("connect", "mobile data network is " + isConnect);
         } catch (Exception e) {
 
         }

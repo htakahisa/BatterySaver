@@ -22,11 +22,14 @@ public class MainService extends Service {
         Log.d("create", "onCreate called : MainService.");
         super.onCreate();
 
+        Env.context = MainService.this;
+
         //レシーバー登録
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+//        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 
         btReciver = new BtReciver();
         registerReceiver(btReciver, filter);

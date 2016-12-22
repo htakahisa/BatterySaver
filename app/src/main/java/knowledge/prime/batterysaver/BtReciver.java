@@ -18,12 +18,12 @@ public class BtReciver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Env.isPlugged = false;//ここで初期化しておく
+//        Env.isPlugged = false;//ここで初期化しておく
 
         String action = intent.getAction();
         if (action != null) {
             if (Intent.ACTION_TIME_CHANGED.equals(action) || Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
-                Log.d("recive", "time change ;" + action);
+//                Log.d("recive", "time change ;" + action);
                 // but it seems to need to do nothing.
                 return;
              } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
@@ -44,20 +44,49 @@ public class BtReciver extends WakefulBroadcastReceiver {
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
                 //バッテリー接続時は ON のまま
                 int plugged = intent.getIntExtra("plugged", 0);
-                if (plugged == BatteryManager.BATTERY_PLUGGED_AC
-                        || plugged == BatteryManager.BATTERY_PLUGGED_USB
-                        ) {
-                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
+                if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB) {
+                    if (!Env.isPlugged) {
+                        Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
+                    }
                     Env.isPlugged = true;
                     Env.intervalType = 0;
                     Env.sleepCount = 0;
                 } else {
                     //バッテリーを外した時
-                    Log.d("plug", "plug is unplugged");
+                    if (Env.isPlugged) {
+                        Log.d("plug", "plug is unplugged");
+                    }
                     Env.isPlugged = false;
 
+                    //wifi 接続を試す
+                    if (Env.isWifiWakeTime) {//すでに接続済みなら何もしない
+                        Env.wifiCount = 0;
+                        return;
+                    }
+                    //モバイルデータ通信がOFF の時は何もしない
+                    if (!Env.isMobileWakeTime) {
+                        Env.wifiCount = 0;
+                        return;//wake中でないなら何もしない
+                    }
+                    //トライ回数を超えたら諦める
+                    if (Env.wifiCount >= 10) {
+                        return;
+                    }
+                    //モバイル接続を確認する
+                    if (!NetworkInfoHandler.isConnectMobileNetwork(Env.context)) {
+                        Log.d("wifi", "mobile is not connected now. connecting...");
+                        return;//モバイル未接続なら何もしない
+                    }
+                    //指定されている場所ならwifi on
+                    if (NetworkInfoHandler.isRestrictedArea(Env.context)) {
+                        Log.d("wifi", "Restricted Area. wifi-on");
+                        WifiHandler.isConnect(Env.context, true);
+                    } else {
+                        Log.d("wifi", "NOT Restricted Area or try connecting now.");
+                        Env.wifiCount++;//指定されていない場所なら諦める
+                    }
+
                 }
-//                Env.isPlugged = false;
                 return;
             } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)) {
                 //起動時は再設定
@@ -66,16 +95,22 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 context.startActivity(intentActivity);
                 return;
             } else if(action.equals("WAKEUP")) {
-                Log.d("intent", "WAKEUP intent. count:" + Env.sleepCount +" and then +1");
+                Log.d("intent", "WAKEUP intent. count:" + Env.sleepCount + " and then +1");
                 Env.sleepCount++;
+//            } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+//                Log.d("network", "network has changed.");
+//                //ネットワークが切り替わった
+//                Env.isNetworkChanged = true;
+//                Intent serviceIntent = new Intent(context,BtService.class);
+//                serviceIntent.setAction(intent.getAction());
+//                startWakefulService(context,serviceIntent);
+//                return;
             } else {
                 Log.d("intent", action);
                 return;
             }
         }
 
-        Intent serviceIntent = new Intent(context,BtService.class);
-        serviceIntent.setAction(intent.getAction());
 
         // 再設定が必要なら設定する
         if (needToChangeNextType()) {
@@ -83,6 +118,8 @@ public class BtReciver extends WakefulBroadcastReceiver {
             return;
         }
         // サービス起動
+        Intent serviceIntent = new Intent(context,BtService.class);
+        serviceIntent.setAction(intent.getAction());
         startWakefulService(context,serviceIntent);
 
     }
