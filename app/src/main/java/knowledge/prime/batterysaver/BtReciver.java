@@ -69,7 +69,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
                         return;//wake中でないなら何もしない
                     }
                     //トライ回数を超えたら諦める
-                    if (Env.wifiCount >= 10) {
+                    if (Env.wifiCount >= 30) {
                         return;
                     }
                     //モバイル接続を確認する
@@ -77,13 +77,19 @@ public class BtReciver extends WakefulBroadcastReceiver {
                         Log.d("wifi", "mobile is not connected now. connecting...");
                         return;//モバイル未接続なら何もしない
                     }
-                    //指定されている場所ならwifi on
-                    if (NetworkInfoHandler.isRestrictedArea(Env.context)) {
+                    //指定されている場所かどうか
+                    Boolean isRestrictedArea = NetworkInfoHandler.isRestrictedArea(Env.context);
+                    if (isRestrictedArea == null) {
+                        //LTEがまだなので待機
+                        Env.wifiCount++;
+                        return;
+                    }
+                    if (isRestrictedArea.booleanValue()) {//指定されてる場所ならwi-fi on
                         Log.d("wifi", "Restricted Area. wifi-on");
                         WifiHandler.isConnect(Env.context, true);
                     } else {
                         Log.d("wifi", "NOT Restricted Area or try connecting now.");
-                        Env.wifiCount++;//指定されていない場所なら諦める
+                        Env.wifiCount = 1000;//指定されていない場所なら諦める
                     }
 
                 }

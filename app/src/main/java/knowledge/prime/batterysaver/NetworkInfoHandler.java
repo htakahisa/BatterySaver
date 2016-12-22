@@ -27,12 +27,18 @@ public class NetworkInfoHandler {
         return nInfo.isConnected();
     }
 
-    public static boolean isRestrictedArea(Context context) {
+    public static Boolean isRestrictedArea(Context context) {
 
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         List<CellInfo> cellInfoList = tm.getAllCellInfo();
+
+        if (cellInfoList.size() == 0) {
+            return null;
+        }
+        boolean hasCellInfoLte = false;
         for (CellInfo cellInfo : cellInfoList) {
             if (cellInfo instanceof CellInfoLte) {
+                hasCellInfoLte = true;
                 int cellId = ((CellInfoLte) cellInfo).getCellIdentity().getCi();
                 Log.d("cellId", "cell id is " + cellId);
                 if (Env.wifiCellIdSet.contains(String.valueOf(cellId))) {
@@ -40,6 +46,11 @@ public class NetworkInfoHandler {
                 }
             }
         }
+        //LTEに接続前ならnull
+        if (!hasCellInfoLte) {
+            return null;
+        }
+
         return false;
     }
 }
