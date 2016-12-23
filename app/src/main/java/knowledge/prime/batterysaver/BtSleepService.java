@@ -36,6 +36,11 @@ public class BtSleepService extends IntentService {
                 Log.d("plug", "skip stop, because plugged.");
                 return;
             }
+            if (Env.isTetheringOn) {
+                Log.d("tethering", "skip stop, because tethering ON");
+                return;
+            }
+
             Log.d("s", "called stop");
             WifiHandler.isConnect(BtSleepService.this, false);
             MobileDataConnectionHandler.toConnectMobile(Env.context, false);

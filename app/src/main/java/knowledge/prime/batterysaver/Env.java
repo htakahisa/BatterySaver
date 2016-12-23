@@ -71,5 +71,7 @@ public class Env {
     public static boolean isWifiWakeTime;
 
     public static int wifiCount = 0;
+
+    public static boolean isTetheringOn;
 }
 

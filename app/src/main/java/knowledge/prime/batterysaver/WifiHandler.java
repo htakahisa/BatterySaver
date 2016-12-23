@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import java.lang.reflect.Method;
+
 /**
  * Created by takahisa007 on 11/28/16.
  */
@@ -33,4 +35,20 @@ public class WifiHandler {
     }
 
 
+    private boolean isTetheringOn(){
+
+        if (wifi == null) {
+            wifi = (WifiManager)Env.context.getSystemService(Context.WIFI_SERVICE);
+        }
+
+        String status = "UNSUPPORTED";
+        try {
+            Method method = wifi.getClass().getMethod("isWifiApEnabled");
+            Boolean isWifiApEnabled = (Boolean)method.invoke(wifi);
+            return isWifiApEnabled.booleanValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

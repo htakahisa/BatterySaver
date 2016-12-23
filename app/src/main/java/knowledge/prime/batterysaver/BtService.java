@@ -36,6 +36,11 @@ public class BtService extends IntentService {
                 Log.d("screen", "always wake up because screen on.");
             }
 
+            //テザリング中も常に wakeup
+            if (Env.isTetheringOn) {
+                Log.d("tether", "always wake up because Tethering ON");
+            }
+
             //まずは設定 ON (すでに ON なら何もしない)
             Log.d("d", "wakeup");
             MobileDataConnectionHandler.toConnectMobile(Env.context, true);

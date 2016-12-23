@@ -9,6 +9,7 @@ import android.util.Log;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by takahisa007 on 11/30/16.
@@ -103,6 +104,18 @@ public class BtReciver extends WakefulBroadcastReceiver {
             } else if(action.equals("WAKEUP")) {
                 Log.d("intent", "WAKEUP intent. count:" + Env.sleepCount + " and then +1");
                 Env.sleepCount++;
+            } else if (action.equals("android.net.conn.TETHER_STATE_CHANGED")) {
+
+                List<String> tetheringNameList = intent.getStringArrayListExtra("activeArray");
+
+                if (tetheringNameList == null || tetheringNameList.size() == 0) {
+                    Log.d("intent", "tethering OFF");
+                    Env.isTetheringOn = false;
+                } else {
+                    Log.d("intent", "tethering ON");
+                    Env.isTetheringOn = true;
+                }
+
 //            } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
 //                Log.d("network", "network has changed.");
 //                //ネットワークが切り替わった
