@@ -30,7 +30,7 @@ public class NotificationHandler {
     public static Notification getNotification(Context context) {
         PendingIntent contentIntent = PendingIntent.getActivity(
                 context, 0,
-                new Intent(context, MainService.class), 0);
+                new Intent(context, MainActivity.class), 0);
 
         Notification notif= new Notification.Builder(context)
                 .setContentTitle(context.getString(R.string.app_name))

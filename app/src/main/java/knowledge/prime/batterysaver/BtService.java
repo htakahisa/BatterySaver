@@ -44,12 +44,21 @@ public class BtService extends IntentService {
             //まずは設定 ON (すでに ON なら何もしない)
             Log.d("d", "wakeup");
             MobileDataConnectionHandler.toConnectMobile(Env.context, true);
-//            this.wakeUpWifiRestrictedArea();
+            this.wakeUpWifiRestrictedArea();
 
 
     } finally {
             // Wakelockの解除処理が必ず呼ばれるようにしておく
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        }
+    }
+
+    /**
+     * モバイル通信ができるか確認してからWIFI接続します。
+     */
+    private void wakeUpWifiRestrictedArea() {
+        if (Env.isWifiRestrictedArea) {//指定場所なら wifi on
+            WifiHandler.isConnect(Env.context, true);
         }
     }
 

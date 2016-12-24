@@ -73,6 +73,11 @@ public class BtReciver extends WakefulBroadcastReceiver {
                     if (Env.wifiCount >= 30) {
                         return;
                     }
+                    Date now = new Date();
+                    long nowHour = Long.valueOf(sdf.format(now.getTime()));
+                    if (Env.fromH <= nowHour && nowHour < Env.toH) {
+                        return;//夜間はwifiしない
+                    }
                     //モバイル接続を確認する
                     if (!NetworkInfoHandler.isConnectMobileNetwork(Env.context)) {
                         Log.d("wifi", "mobile is not connected now. connecting...");
@@ -85,12 +90,13 @@ public class BtReciver extends WakefulBroadcastReceiver {
                         Env.wifiCount++;
                         return;
                     }
-                    if (isRestrictedArea.booleanValue()) {//指定されてる場所ならwi-fi on
-                        Log.d("wifi", "Restricted Area. wifi-on");
-                        WifiHandler.isConnect(Env.context, true);
+                    if (isRestrictedArea.booleanValue()) {//指定されてる場所
+                        Log.d("wifi", "Restricted Area.");
+                        Env.isWifiRestrictedArea = true;
                     } else {
                         Log.d("wifi", "NOT Restricted Area or try connecting now.");
                         Env.wifiCount = 1000;//指定されていない場所なら諦める
+                        Env.isWifiRestrictedArea = false;
                     }
 
                 }
