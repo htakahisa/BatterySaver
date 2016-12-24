@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                int maxLine = 8;
+                int maxLine = 60;
                 StringBuilder commandLine = new StringBuilder();
                 commandLine.append("logcat ");
                 commandLine.append("-d ");

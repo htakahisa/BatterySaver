@@ -67,15 +67,21 @@ public class BtReciver extends WakefulBroadcastReceiver {
                     //モバイルデータ通信がOFF の時は何もしない
                     if (!Env.isMobileWakeTime) {
                         Env.wifiCount = 0;
+                        Env.isWifiRestrictedArea = false;
                         return;//wake中でないなら何もしない
                     }
                     //トライ回数を超えたら諦める
                     if (Env.wifiCount >= 30) {
+                        Env.isWifiRestrictedArea = false;
                         return;
                     }
                     Date now = new Date();
                     long nowHour = Long.valueOf(sdf.format(now.getTime()));
                     if (Env.fromH <= nowHour && nowHour < Env.toH) {
+                        if (Env.isWifiRestrictedArea) {
+                            Log.d("wifi", "wifi is off. because specified time.");
+                        }
+                        Env.isWifiRestrictedArea = false;
                         return;//夜間はwifiしない
                     }
                     //モバイル接続を確認する
@@ -121,15 +127,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
                     Log.d("intent", "tethering ON");
                     Env.isTetheringOn = true;
                 }
-
-//            } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-//                Log.d("network", "network has changed.");
-//                //ネットワークが切り替わった
-//                Env.isNetworkChanged = true;
-//                Intent serviceIntent = new Intent(context,BtService.class);
-//                serviceIntent.setAction(intent.getAction());
-//                startWakefulService(context,serviceIntent);
-//                return;
+                return;
             } else {
                 Log.d("intent", action);
                 return;
