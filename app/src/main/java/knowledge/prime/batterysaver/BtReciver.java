@@ -6,9 +6,7 @@ import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,7 +65,6 @@ public class BtReciver extends WakefulBroadcastReceiver {
                     //モバイルデータ通信がOFF の時は何もしない
                     if (!Env.isMobileWakeTime) {
                         Env.wifiCount = 0;
-                        Env.isWifiRestrictedArea = false;
                         return;//wake中でないなら何もしない
                     }
                     //トライ回数を超えたら諦める
@@ -75,10 +72,8 @@ public class BtReciver extends WakefulBroadcastReceiver {
                         Env.isWifiRestrictedArea = false;
                         return;
                     }
-                    Date now = new Date();
-                    long nowHour = Long.valueOf(sdf.format(now.getTime()));
-                    if (Env.fromH <= nowHour && nowHour < Env.toH) {
-                        if (Env.isWifiRestrictedArea) {
+                    if (SpecifiedTimeHandler.isSpecifiedTime()) {
+                        if (Env.isWifiRestrictedArea) {//ログだけ出力
                             Log.d("wifi", "wifi is off. because specified time.");
                         }
                         Env.isWifiRestrictedArea = false;
@@ -147,7 +142,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
     }
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("H");
+
 
     private boolean needToChangeNextType() {
 
@@ -174,9 +169,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
         }
         if (Env.intervalType == 5) {
             //指定時間外の場合は直ちに type4 に戻す
-            Date now = new Date();
-            long nowHour = Long.valueOf(sdf.format(now.getTime()));
-            if (Env.fromH <= nowHour && nowHour < Env.toH) {
+            if (SpecifiedTimeHandler.isSpecifiedTime()) {
                 return false; //時間内は何もしない
             } else {
                 Env.intervalType = 4;
@@ -193,9 +186,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 return true;
             }
             if (Env.intervalType == 4) {// type4 の時は時間帯によって type 5に変更
-                Date now = new Date();
-                long nowHour = Long.valueOf(sdf.format(now.getTime()));
-                if (Env.fromH <= nowHour && nowHour < Env.toH) {
+                if (SpecifiedTimeHandler.isSpecifiedTime()) {
                     Env.intervalType = 5;
                     Env.sleepCount = 0;
                     return true;

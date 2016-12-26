@@ -62,29 +62,5 @@ public class BtService extends IntentService {
         }
     }
 
-//    /**
-//     * モバイル通信ができるか確認してからWIFI接続します。
-//     */
-//    private void wakeUpWifiRestrictedArea() {
-//
-//        ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo info = manager.getActiveNetworkInfo();
-//        if (info == null || !info.isConnected()) {
-//            Log.d("wifi", "mobile network is not connected. wifi-on skip.");
-//            return;
-//        }
-//
-//        for (String cellId : CellInfoHandler.getCellId(BtService.this)) {
-//            //指定場所なら WI-FI ON
-//            if (Env.wifiCellIdSet.contains(cellId)) {
-//                WifiHandler.isConnect(BtService.this, true);
-//                Log.d("cellId", "wifi on. Restricted area.");
-//            }
-//        }
-//        Env.isNetworkChanged = false;
-//
-//    }
-
-
 
 }
