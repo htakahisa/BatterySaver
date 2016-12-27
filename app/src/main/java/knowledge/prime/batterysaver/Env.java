@@ -74,5 +74,7 @@ public class Env {
     public static boolean isTetheringOn;
 
     public static boolean isWifiRestrictedArea;
+
+
 }
 

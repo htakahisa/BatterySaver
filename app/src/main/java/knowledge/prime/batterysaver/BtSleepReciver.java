@@ -36,12 +36,7 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
      */
     private void changeWIfiRestrictedAreaFlag() {
         //次回に wifi on にするか判定
-        if (SpecifiedTimeHandler.isSpecifiedTime()) {
-            Log.d("wifi", "wifi is off. because specified time.");
-            Env.isWifiRestrictedArea = false;
-            //夜間はwifiしない
-            return;
-        }
+
         //モバイル接続を確認する
         if (!NetworkInfoHandler.isConnectMobileNetwork(Env.context)) {
             Log.d("wifi", "mobile is not connected now. connecting...");

@@ -57,7 +57,12 @@ public class BtService extends IntentService {
      * モバイル通信ができるか確認してからWIFI接続します。
      */
     private void wakeUpWifiRestrictedArea() {
-        if (Env.isWifiRestrictedArea) {//指定場所なら wifi on
+        if (Env.isWifiRestrictedArea) {//指定場所
+            //指定場所でも、画面がOFFで、夜の場合は on にしない
+            if (!Env.isScreenOn && SpecifiedTimeHandler.isSpecifiedTime()) {
+                return;
+            }
+
             WifiHandler.isConnect(Env.context, true);
         }
     }
