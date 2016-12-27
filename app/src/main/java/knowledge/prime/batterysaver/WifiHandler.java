@@ -18,6 +18,7 @@ public class WifiHandler {
     }
 
     public static void isConnect(Context context, boolean is) {
+        Log.d("connect", "wifi is " + is);
         Env.isWifiWakeTime = is;
 
         if (wifi == null) {
@@ -31,7 +32,6 @@ public class WifiHandler {
 
         wifi.setWifiEnabled(is);
 
-        Log.d("connect", "wifi is " + is);
     }
 
 

@@ -3,6 +3,7 @@ package knowledge.prime.batterysaver;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -28,11 +29,23 @@ public class MainService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+//        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
 //        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 
         btReciver = new BtReciver();
         registerReceiver(btReciver, filter);
+
+        //充電状態を初期化
+        IntentFilter batteryFiler = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = this.registerReceiver(null, batteryFiler);
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        if(status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB) {
+            //充電中
+            Log.d("plug", "(MainService) always on. because plugged(ac=1, usd=2):" + status);
+            Env.isPlugged = true;
+            Env.intervalType = 0;
+            Env.sleepCount = 0;
+        }
 
     }
 

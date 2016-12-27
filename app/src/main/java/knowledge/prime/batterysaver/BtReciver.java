@@ -39,69 +39,21 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 resetInterval(context);
                 return;
 
-
-            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
+            } else if (Intent.ACTION_POWER_CONNECTED.equals(intent.getAction())) {
                 //バッテリー接続時は ON のまま
                 int plugged = intent.getIntExtra("plugged", 0);
                 if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB) {
-                    if (!Env.isPlugged) {
-                        Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-                    }
+                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
                     Env.isPlugged = true;
                     Env.intervalType = 0;
                     Env.sleepCount = 0;
-                } else {
-                    //バッテリーを外した時
-                    if (Env.isPlugged) {
-                        Log.d("plug", "plug is unplugged");
-                    }
-                    Env.isPlugged = false;
-
-                    //wifi 接続を試す
-                    if (Env.isWifiWakeTime) {//すでに接続済みなら何もしない
-                        Env.wifiCount = 0;
-                        return;
-                    }
-                    //モバイルデータ通信がOFF の時は何もしない
-                    if (!Env.isMobileWakeTime) {
-                        Env.wifiCount = 0;
-                        return;//wake中でないなら何もしない
-                    }
-                    //トライ回数を超えたら諦める
-                    if (Env.wifiCount >= 30) {
-                        Env.isWifiRestrictedArea = false;
-                        return;
-                    }
-                    if (SpecifiedTimeHandler.isSpecifiedTime()) {
-                        if (Env.isWifiRestrictedArea) {//ログだけ出力
-                            Log.d("wifi", "wifi is off. because specified time.");
-                        }
-                        Env.isWifiRestrictedArea = false;
-                        return;//夜間はwifiしない
-                    }
-                    //モバイル接続を確認する
-                    if (!NetworkInfoHandler.isConnectMobileNetwork(Env.context)) {
-                        Log.d("wifi", "mobile is not connected now. connecting...");
-                        return;//モバイル未接続なら何もしない
-                    }
-                    //指定されている場所かどうか
-                    Boolean isRestrictedArea = NetworkInfoHandler.isRestrictedArea(Env.context);
-                    if (isRestrictedArea == null) {
-                        //LTEがまだなので待機
-                        Env.wifiCount++;
-                        return;
-                    }
-                    if (isRestrictedArea.booleanValue()) {//指定されてる場所
-                        Log.d("wifi", "Restricted Area.");
-                        Env.isWifiRestrictedArea = true;
-                    } else {
-                        Log.d("wifi", "NOT Restricted Area or try connecting now.");
-                        Env.wifiCount = 1000;//指定されていない場所なら諦める
-                        Env.isWifiRestrictedArea = false;
-                    }
-
                 }
+            } else if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) {
+                //ここにはプラグを抜いたときの処理
+                Log.d("plug", "plug is unplugged");
+                Env.isPlugged = false;
                 return;
+
             } else if(action.equals(Intent.ACTION_BOOT_COMPLETED)) {
                 //起動時は再設定
                 Intent intentActivity = new Intent(context, MainActivity.class);
@@ -124,7 +76,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 }
                 return;
             } else {
-                Log.d("intent", action);
+                Log.d("intent", "BtReciver:" + action);
                 return;
             }
         }

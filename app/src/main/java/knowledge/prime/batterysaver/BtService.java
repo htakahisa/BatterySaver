@@ -43,8 +43,8 @@ public class BtService extends IntentService {
 
             //まずは設定 ON (すでに ON なら何もしない)
             Log.d("d", "wakeup");
-            MobileDataConnectionHandler.toConnectMobile(Env.context, true);
             this.wakeUpWifiRestrictedArea();
+            MobileDataConnectionHandler.toConnectMobile(Env.context, true);
 
 
     } finally {

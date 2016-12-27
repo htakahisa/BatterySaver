@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         Env.sleepTime4  = PropertyUtils.getProperty(MainActivity.this, "sleepTime4", 900000);
         Env.sleepTime5  = PropertyUtils.getProperty(MainActivity.this, "sleepTime5", 1800000);
 
-        Env.fromH = PropertyUtils.getProperty(MainActivity.this, "fromH", 0);
+        Env.fromH = PropertyUtils.getProperty(MainActivity.this, "fromH", 23);
         Env.toH = PropertyUtils.getProperty(MainActivity.this, "toH", 7);
 
         Env.wakeupTime = PropertyUtils.getProperty(MainActivity.this, "wakeupTime", 60000);
@@ -352,7 +352,16 @@ public class MainActivity extends AppCompatActivity {
 
         PropertyUtils.setProperty(MainActivity.this, "fromH", Env.fromH);
         PropertyUtils.setProperty(MainActivity.this, "toH", Env.toH);
-        PropertyUtils.setProperty(MainActivity.this, "intervalType", Env.intervalType);
+
+        StringBuilder sb = new StringBuilder();
+        for (String s : Env.wifiCellIdSet) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(s);
+        }
+        PropertyUtils.setProperty(MainActivity.this, "cellIds", sb.toString());
+
     }
 
     @Override
