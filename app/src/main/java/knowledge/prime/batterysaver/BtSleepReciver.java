@@ -17,7 +17,7 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
         if (action != null) {
             if (action.equals("SLEEP")) {
                 //wifi を on にする指定場所ならフラグ変更
-                changeWIfiRistrictedAreaFlag();
+                changeWIfiRestrictedAreaFlag();
 
             } else {
                 return;
@@ -34,12 +34,10 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
     /**
      * WIFI 指定場所ならフラグを設定する
      */
-    private void changeWIfiRistrictedAreaFlag() {
+    private void changeWIfiRestrictedAreaFlag() {
         //次回に wifi on にするか判定
         if (SpecifiedTimeHandler.isSpecifiedTime()) {
-            if (Env.isWifiRestrictedArea) {//ログだけ出力
-                Log.d("wifi", "wifi is off. because specified time.");
-            }
+            Log.d("wifi", "wifi is off. because specified time.");
             Env.isWifiRestrictedArea = false;
             //夜間はwifiしない
             return;
