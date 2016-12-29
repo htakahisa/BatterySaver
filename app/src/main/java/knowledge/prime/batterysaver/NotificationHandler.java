@@ -34,7 +34,7 @@ public class NotificationHandler {
 
         Notification notif= new Notification.Builder(context)
                 .setContentTitle(context.getString(R.string.app_name))
-//                .setContentText("")
+                .setContentText("now working...")
                 .setSmallIcon(R.drawable.status_bar_notif2)
                 .setContentIntent(contentIntent)
                 .build();

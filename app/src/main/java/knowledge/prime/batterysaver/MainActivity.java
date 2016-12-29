@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //設定値をプロパティから取得
-        initSetting();
+        PropertyUtils.initOnMemorySetting(MainActivity.this);
         //レイアウトのオブジェクトの値を更新
         setInitLayoutValue();
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.clear();
                 editor.commit();
                 //メモリ上を初期値で初期化
-                initSetting();
+                PropertyUtils.initOnMemorySetting(MainActivity.this);
                 //レイアウトも更新
                 setInitLayoutValue();
             }
@@ -148,39 +148,11 @@ public class MainActivity extends AppCompatActivity {
         toH.setText(String.valueOf(Env.toH));
     }
 
-    /**
-     * 初期化
-     */
-    private void initSetting() {
-        Env.sleepTime   = PropertyUtils.getProperty(MainActivity.this, "sleepTime", 60000);
-        Env.sleepTime2  = PropertyUtils.getProperty(MainActivity.this, "sleepTime2", 300000);
-        Env.sleepTime3  = PropertyUtils.getProperty(MainActivity.this, "sleepTime3", 600000);
-        Env.sleepTime4  = PropertyUtils.getProperty(MainActivity.this, "sleepTime4", 900000);
-        Env.sleepTime5  = PropertyUtils.getProperty(MainActivity.this, "sleepTime5", 1800000);
 
-        Env.fromH = PropertyUtils.getProperty(MainActivity.this, "fromH", 23);
-        Env.toH = PropertyUtils.getProperty(MainActivity.this, "toH", 7);
-
-        Env.wakeupTime = PropertyUtils.getProperty(MainActivity.this, "wakeupTime", 60000);
-        Env.idleTime   = PropertyUtils.getProperty(MainActivity.this, "idleTime", 60000);
-
-        Env.count  = PropertyUtils.getProperty(MainActivity.this, "count", 1);
-        Env.count2 = PropertyUtils.getProperty(MainActivity.this, "count2", 3);
-        Env.count3 = PropertyUtils.getProperty(MainActivity.this, "count3", 3);
-        Env.count4 = PropertyUtils.getProperty(MainActivity.this, "count4", 3);
-
-        String cellIds = PropertyUtils.getProperty(MainActivity.this, "cellIds", "");
-        Set<String> cellIdSet = new HashSet<>();
-        for (String s : cellIds.split(",")) {
-            cellIdSet.add(s);
-        }
-        Env.wifiCellIdSet = cellIdSet;
-
-        Env.intervalType = 0;
-    }
 
     /**
-     * Logcat のログを出力します。
+     * //Logcat のログを出力します。
+     * イベントログを出力します。
      */
     private void setLogcatEvent() {
         TextView view = (TextView)findViewById(R.id.logcat);

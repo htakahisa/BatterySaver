@@ -59,6 +59,7 @@ public class BtService extends IntentService {
         if (Env.isWifiRestrictedArea) {//指定場所
             //指定場所でも、画面がOFFで、夜の場合は on にしない
             if (!Env.isScreenOn && SpecifiedTimeHandler.isSpecifiedTime()) {
+                EventLog.d(this.getClass(), "wifi", "wifi off. because specified time.(but restricted area)");
                 return;
             }
 

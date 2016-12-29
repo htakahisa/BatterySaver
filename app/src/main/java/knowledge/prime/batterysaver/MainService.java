@@ -23,6 +23,9 @@ public class MainService extends Service {
 
         Env.context = MainService.this;
 
+        //プロパティ値で初期化
+        PropertyUtils.initOnMemorySetting(MainService.this);
+
         //レシーバー登録
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
