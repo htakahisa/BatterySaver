@@ -330,7 +330,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/logcat"
                 android:layout_gravity="center_horizontal"
-                android:text="logcat"
+                android:text="EventLog"
                 android:inputType="textImeMultiLine|text|textMultiLine"
                 android:singleLine="false" />
 

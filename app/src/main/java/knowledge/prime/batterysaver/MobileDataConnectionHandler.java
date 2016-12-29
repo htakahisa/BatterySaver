@@ -2,7 +2,6 @@ package knowledge.prime.batterysaver;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -27,7 +26,7 @@ public class MobileDataConnectionHandler {
 
             setMobileDataEnabledMethod.invoke(iConnectivityManager, isConnect);
 
-            Log.d("connect", "mobile data network is " + isConnect);
+            EventLog.d(MobileDataConnectionHandler.class, "connect", "mobile data network is " + isConnect);
         } catch (Exception e) {
 
         }

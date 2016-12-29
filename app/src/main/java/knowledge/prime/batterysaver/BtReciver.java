@@ -2,9 +2,7 @@ package knowledge.prime.batterysaver;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.BatteryManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Log;
 
 import java.util.Calendar;
 import java.util.List;
@@ -27,12 +25,12 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 return;
              } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 // 画面ON時
-                Log.d("screen", "SCREEN_ON");
+                EventLog.d(this.getClass(), "screen", "SCREEN_ON");
                 Env.isScreenOn = true;
 
             } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 // 画面OFF時
-                Log.d("screen", "SCREEN_OFF");
+                EventLog.d(this.getClass(), "screen", "SCREEN_OFF");
                 Env.isScreenOn = false;
                 Env.intervalType = 0;
                 Env.sleepCount = 0;
@@ -41,16 +39,11 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
             } else if (Intent.ACTION_POWER_CONNECTED.equals(intent.getAction())) {
                 //バッテリー接続時は ON のまま
-                int plugged = intent.getIntExtra("plugged", 0);
-                if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB) {
-                    Log.d("plug", "always on. because plugged(ac=1, usd=2):" + plugged);
-                    Env.isPlugged = true;
-                    Env.intervalType = 0;
-                    Env.sleepCount = 0;
-                }
+                BatteryHandler.isCharging(intent);
+
             } else if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) {
                 //ここにはプラグを抜いたときの処理
-                Log.d("plug", "plug is unplugged");
+                EventLog.d(this.getClass(), "plug", "plug is unplugged");
                 Env.isPlugged = false;
                 return;
 
@@ -61,22 +54,22 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 context.startActivity(intentActivity);
                 return;
             } else if(action.equals("WAKEUP")) {
-                Log.d("intent", "WAKEUP intent. count:" + Env.sleepCount + " and then +1");
+                EventLog.d(this.getClass(), "intent", "WAKEUP intent. count:" + Env.sleepCount + " and then +1");
                 Env.sleepCount++;
             } else if (action.equals("android.net.conn.TETHER_STATE_CHANGED")) {
 
                 List<String> tetheringNameList = intent.getStringArrayListExtra("activeArray");
 
                 if (tetheringNameList == null || tetheringNameList.size() == 0) {
-                    Log.d("intent", "tethering OFF");
+                    EventLog.d(this.getClass(), "intent", "tethering OFF");
                     Env.isTetheringOn = false;
                 } else {
-                    Log.d("intent", "tethering ON");
+                    EventLog.d(this.getClass(), "intent", "tethering ON");
                     Env.isTetheringOn = true;
                 }
                 return;
             } else {
-                Log.d("intent", "BtReciver:" + action);
+                EventLog.d(this.getClass(), "intent", "BtReceiver:" + action);
                 return;
             }
         }
@@ -131,7 +124,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
         }
 
         if (Env.sleepCount > maxCount) {
-            Log.d("count", "sleepCount:" + Env.sleepCount + ", maxCount:" + maxCount);
+            EventLog.d(this.getClass(), "count", "sleepCount:" + Env.sleepCount + ", maxCount:" + maxCount);
             if (Env.intervalType < 4) {
                 Env.intervalType = Env.intervalType + 1;
                 Env.sleepCount = 0;

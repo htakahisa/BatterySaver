@@ -3,10 +3,8 @@ package knowledge.prime.batterysaver;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.BatteryManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -20,7 +18,7 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
 
-        Log.d("create", "onCreate called : MainService.");
+        EventLog.d(this.getClass(), "create", "onCreate called.");
         super.onCreate();
 
         Env.context = MainService.this;
@@ -36,23 +34,14 @@ public class MainService extends Service {
         registerReceiver(btReciver, filter);
 
         //充電状態を初期化
-        IntentFilter batteryFiler = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = this.registerReceiver(null, batteryFiler);
-        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        if(status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB) {
-            //充電中
-            Log.d("plug", "(MainService) always on. because plugged(ac=1, usd=2):" + status);
-            Env.isPlugged = true;
-            Env.intervalType = 0;
-            Env.sleepCount = 0;
-        }
+        BatteryHandler.isCharging();
 
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d("service", "onStartCommand : MainService");
+        EventLog.d(this.getClass(), "service", "onStartCommand called.");
 
         //battery saving start
         Calendar triggerTime = Calendar.getInstance();
@@ -71,7 +60,7 @@ public class MainService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d("service", "onDestroy called : MainService");
+        EventLog.d(this.getClass(), "service", "onDestroy called.");
         super.onDestroy();
 
         //battery saving stop

@@ -16,6 +16,10 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
         String action = intent.getAction();
         if (action != null) {
             if (action.equals("SLEEP")) {
+                //充電中の場合は sleep 不要
+                if (BatteryHandler.isCharging()) {
+                    return;
+                }
                 //wifi を on にする指定場所ならフラグ変更
                 changeWIfiRestrictedAreaFlag();
 

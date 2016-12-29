@@ -17,31 +17,31 @@ public class BtSleepService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            Log.d("call", "RECIVE sleep, type:" + Env.intervalType + ", wakeup:" + Env.wakeupTime + ", sleep:" + Env.getSleepTime());
+            EventLog.d(this.getClass(), "call", "RECIVE sleep, type:" + Env.intervalType + ", wakeup:" + Env.wakeupTime + ", sleep:" + Env.getSleepTime());
 
             if (Env.isStop) {
-                Log.d("s", "stoped.");
+                EventLog.d(this.getClass(), "s", "stoped.");
                 return;
             }
             if (Env.isScreenOn) {
-                Log.d("s", "skip stop. because screen on");
+                EventLog.d(this.getClass(), "s", "skip stop. because screen on");
                 return;
             }
             if (Env.isScreenOffIdle) {
-                Log.d("s", "skip stop. because screen off idle");
+                EventLog.d(this.getClass(), "s", "skip stop. because screen off idle");
                 Env.isScreenOffIdle = false;
                 return;
             }
             if (Env.isPlugged && !Env.isDebug) {
-                Log.d("plug", "skip stop, because plugged.");
+                EventLog.d(this.getClass(), "plug", "skip stop, because plugged.");
                 return;
             }
             if (Env.isTetheringOn) {
-                Log.d("tethering", "skip stop, because tethering ON");
+                EventLog.d(this.getClass(), "tethering", "skip stop, because tethering ON");
                 return;
             }
 
-            Log.d("s", "called stop");
+            EventLog.d(this.getClass(), "s", "called stop");
             WifiHandler.isConnect(BtSleepService.this, false);
             MobileDataConnectionHandler.toConnectMobile(Env.context, false);
 

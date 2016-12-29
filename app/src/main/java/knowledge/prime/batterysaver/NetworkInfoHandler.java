@@ -40,8 +40,8 @@ public class NetworkInfoHandler {
             if (cellInfo instanceof CellInfoLte) {
                 hasCellInfoLte = true;
                 int cellId = ((CellInfoLte) cellInfo).getCellIdentity().getCi();
-                Log.d("cellId", "cell id is " + cellId);
-                Log.d("cellId", "designation cell id is " + Env.wifiCellIdSet);
+                EventLog.d(NetworkInfoHandler.class, "cellId", "cell id is " + cellId);
+                EventLog.d(NetworkInfoHandler.class, "cellId", "designation cell id is " + Env.wifiCellIdSet);
                 if (Env.wifiCellIdSet.contains(String.valueOf(cellId))) {
                     return true;
                 }

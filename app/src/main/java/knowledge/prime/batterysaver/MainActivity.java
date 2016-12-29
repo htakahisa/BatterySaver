@@ -7,7 +7,6 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -15,11 +14,7 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -110,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 //メモリも更新
                 Env.wifiCellIdSet = cellIdSet;
 
-                Log.d("cellId", "cellId:" + sb.toString());
+                EventLog.d(this.getClass(), "cellId", "cellId:" + sb.toString());
             }
         });
 
@@ -194,41 +189,48 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                int maxLine = 60;
-                StringBuilder commandLine = new StringBuilder();
-                commandLine.append("logcat ");
-                commandLine.append("-d ");
-                commandLine.append("-v ");
-                commandLine.append("time ");
-//                commandLine.append("-s ");
-
-                try{
-                    //clear
-
-                    Process process = Runtime.getRuntime().exec(commandLine.toString());
-                    BufferedReader br = new BufferedReader( new InputStreamReader(process.getInputStream()), 1024);
-                    String thisLine;
-                    List<String> logList = new ArrayList<String>();
-                    StringBuilder sb = new StringBuilder();
-                    while ((thisLine = br.readLine()) != null) {
-//                        if (i++ >= maxLine) {
-//                            break;
-//                        }
-                        logList.add(thisLine);
-                    }
-                    int startLine = logList.size() - maxLine;
-                    if (startLine < 0) {
-                        startLine = 0;
-                    }
-                    for (int i = logList.size() - 1; i >= startLine ; i--) {
-                        sb.append(logList.get(i)).append(System.getProperty("line.separator"));
-                    }
-
-                    ((TextView)view).setText(sb.toString());
-
-                }catch(Exception e){
-                    e.printStackTrace();
+                StringBuilder sb = new StringBuilder();
+                for (String s : Env.eventLog) {
+                    sb.append(s).append(System.getProperty("line.separator"));
                 }
+
+                ((TextView)view).setText(sb.toString());
+
+//                int maxLine = 60;
+//                StringBuilder commandLine = new StringBuilder();
+//                commandLine.append("logcat ");
+//                commandLine.append("-d ");
+//                commandLine.append("-v ");
+//                commandLine.append("time ");
+////                commandLine.append("-s ");
+//
+//                try{
+//                    //clear
+//
+//                    Process process = Runtime.getRuntime().exec(commandLine.toString());
+//                    BufferedReader br = new BufferedReader( new InputStreamReader(process.getInputStream()), 1024);
+//                    String thisLine;
+//                    List<String> logList = new ArrayList<String>();
+//                    StringBuilder sb = new StringBuilder();
+//                    while ((thisLine = br.readLine()) != null) {
+////                        if (i++ >= maxLine) {
+////                            break;
+////                        }
+//                        logList.add(thisLine);
+//                    }
+//                    int startLine = logList.size() - maxLine;
+//                    if (startLine < 0) {
+//                        startLine = 0;
+//                    }
+//                    for (int i = logList.size() - 1; i >= startLine ; i--) {
+//                        sb.append(logList.get(i)).append(System.getProperty("line.separator"));
+//                    }
+//
+//                    ((TextView)view).setText(sb.toString());
+//
+//                }catch(Exception e){
+//                    e.printStackTrace();
+//                }
 
 
             }
@@ -308,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    Log.d("call", "start called");
+                    EventLog.d(this.getClass(), "call", "start called");
                     saveProperty();
 
                     Intent intent = new Intent(getApplication(), MainService.class);
@@ -316,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
 
 
-                    Log.d("call", "stop called");
+                    EventLog.d(this.getClass(), "call", "stop called");
                     saveProperty();
                     Intent intent = new Intent(getApplication(), MainService.class);
                     stopService(intent);
@@ -328,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("end", "onStop called.");
+        EventLog.d(this.getClass(), "end", "onStop called.");
 
         saveProperty();
 
@@ -367,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("end", "onDestroy called.");
+        EventLog.d(this.getClass(), "end", "onDestroy called.");
 
     }
 

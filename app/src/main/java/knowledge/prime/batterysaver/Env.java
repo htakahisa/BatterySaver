@@ -3,6 +3,7 @@ package knowledge.prime.batterysaver;
 import android.content.Context;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -75,6 +76,6 @@ public class Env {
 
     public static boolean isWifiRestrictedArea;
 
-
+    public static LinkedList<String> eventLog = new LinkedList<>();
 }
 
