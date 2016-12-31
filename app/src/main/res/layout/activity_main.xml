@@ -41,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="5"
+                android:ems="3"
                 android:id="@+id/sleepTimeInput"
                 />
 
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="msec / count"
+                android:text="sec / count"
                 android:id="@+id/textView4"
                 android:layout_weight="1" />
 
@@ -81,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="5"
+                android:ems="3"
                 android:id="@+id/sleepTimeInput2"
                 />
 
@@ -89,7 +89,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="msec / count"
+                android:text="sec / count"
                 android:id="@+id/textView42"
                 android:layout_weight="1" />
 
@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="5"
+                android:ems="3"
                 android:id="@+id/sleepTimeInput3"
                 />
 
@@ -129,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="msec / count"
+                android:text="sec / count"
                 android:id="@+id/textView423"
                 android:layout_weight="1" />
 
@@ -161,7 +161,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="5"
+                android:ems="3"
                 android:id="@+id/sleepTimeInput4"
                 />
 
@@ -169,7 +169,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="msec / count"
+                android:text="sec / count"
                 android:id="@+id/textView424"
                 android:layout_weight="1" />
 
@@ -195,14 +195,14 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="sleep "
-                android:id="@+id/textView435"/>
+                android:id="@+id/textView435" />
 
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="5"
+                android:ems="3"
                 android:id="@+id/sleepTimeInput5"
                 />
 
@@ -210,16 +210,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="msec"
+                android:text="sec"
                 android:id="@+id/textView455"
                 android:layout_weight="1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
 
             <EditText
@@ -234,7 +227,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="and "
+                android:text="to"
                 android:id="@+id/textView436"/>
 
             <EditText
@@ -244,6 +237,15 @@
                 android:ems="2"
                 android:id="@+id/toH"
                 />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -276,11 +278,19 @@
                 android:id="@+id/textView2" />
 
             <EditText
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="10"
+                android:ems="3"
                 android:id="@+id/wakeupTimeInput" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="sec"
+                android:id="@+id/textView424w"
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -298,11 +308,20 @@
                 android:id="@+id/textView3" />
 
             <EditText
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="10"
+                android:ems="3"
                 android:id="@+id/idleTimeInput" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="sec"
+                android:id="@+id/textView425w"
+                android:layout_weight="1" />
+
         </LinearLayout>
 
         <LinearLayout

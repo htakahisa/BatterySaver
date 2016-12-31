@@ -39,7 +39,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
             } else if (Intent.ACTION_POWER_CONNECTED.equals(intent.getAction())) {
                 //バッテリー接続時は ON のまま
-                BatteryHandler.isCharging(intent);
+                BatteryHandler.isCharging();
 
             } else if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) {
                 //ここにはプラグを抜いたときの処理

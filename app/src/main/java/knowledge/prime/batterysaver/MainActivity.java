@@ -118,15 +118,15 @@ public class MainActivity extends AppCompatActivity {
     private void setInitLayoutValue() {
         //初期値のセット
         EditText sleepText = (EditText)findViewById(R.id.sleepTimeInput);
-        sleepText.setText(String.valueOf(Env.sleepTime));
+        sleepText.setText(String.valueOf(Env.sleepTime / 1000));
         EditText sleepText2 = (EditText)findViewById(R.id.sleepTimeInput2);
-        sleepText2.setText(String.valueOf(Env.sleepTime2));
+        sleepText2.setText(String.valueOf(Env.sleepTime2 / 1000));
         EditText sleepText3 = (EditText)findViewById(R.id.sleepTimeInput3);
-        sleepText3.setText(String.valueOf(Env.sleepTime3));
+        sleepText3.setText(String.valueOf(Env.sleepTime3 / 1000));
         EditText sleepText4 = (EditText)findViewById(R.id.sleepTimeInput4);
-        sleepText4.setText(String.valueOf(Env.sleepTime4));
+        sleepText4.setText(String.valueOf(Env.sleepTime4 / 1000));
         EditText sleepText5 = (EditText)findViewById(R.id.sleepTimeInput5);
-        sleepText5.setText(String.valueOf(Env.sleepTime5));
+        sleepText5.setText(String.valueOf(Env.sleepTime5 / 1000));
 
         EditText sCountText = (EditText)findViewById(R.id.count1);
         sCountText.setText(String.valueOf(Env.count));
@@ -138,9 +138,9 @@ public class MainActivity extends AppCompatActivity {
         sCountText4.setText(String.valueOf(Env.count4));
 
         EditText wakeupText = (EditText)findViewById(R.id.wakeupTimeInput);
-        wakeupText.setText(String.valueOf(Env.wakeupTime));
+        wakeupText.setText(String.valueOf(Env.wakeupTime / 1000));
         EditText idleText = (EditText)findViewById(R.id.idleTimeInput);
-        idleText.setText(String.valueOf(Env.idleTime));
+        idleText.setText(String.valueOf(Env.idleTime / 1000));
 
         EditText fromH = (EditText)findViewById(R.id.fromH);
         fromH.setText(String.valueOf(Env.fromH));
@@ -223,23 +223,23 @@ public class MainActivity extends AppCompatActivity {
                     //sleeptime
                     EditText sleepEditText = (EditText) findViewById(R.id.sleepTimeInput);
                     if (sleepEditText.getText() != null) {
-                        Env.sleepTime = Long.valueOf(sleepEditText.getText().toString()).longValue();
+                        Env.sleepTime = Long.valueOf(sleepEditText.getText().toString()).longValue() * 1000;
                     }
                     EditText sleepEditText2 = (EditText) findViewById(R.id.sleepTimeInput2);
                     if (sleepEditText2.getText() != null) {
-                        Env.sleepTime2 = Long.valueOf(sleepEditText2.getText().toString()).longValue();
+                        Env.sleepTime2 = Long.valueOf(sleepEditText2.getText().toString()).longValue() * 1000;
                     }
                     EditText sleepEditText3 = (EditText) findViewById(R.id.sleepTimeInput3);
                     if (sleepEditText3.getText() != null) {
-                        Env.sleepTime3 = Long.valueOf(sleepEditText3.getText().toString()).longValue();
+                        Env.sleepTime3 = Long.valueOf(sleepEditText3.getText().toString()).longValue() * 1000;
                     }
                     EditText sleepEditText4 = (EditText) findViewById(R.id.sleepTimeInput4);
                     if (sleepEditText4.getText() != null) {
-                        Env.sleepTime4 = Long.valueOf(sleepEditText4.getText().toString()).longValue();
+                        Env.sleepTime4 = Long.valueOf(sleepEditText4.getText().toString()).longValue() * 1000;
                     }
                     EditText sleepEditText5 = (EditText) findViewById(R.id.sleepTimeInput5);
                     if (sleepEditText5.getText() != null) {
-                        Env.sleepTime5 = Long.valueOf(sleepEditText5.getText().toString()).longValue();
+                        Env.sleepTime5 = Long.valueOf(sleepEditText5.getText().toString()).longValue() * 1000;
                     }
 
                     //count
@@ -263,12 +263,12 @@ public class MainActivity extends AppCompatActivity {
                     //wakeuptime
                     EditText wakeupEditText = (EditText) findViewById(R.id.wakeupTimeInput);
                     if (wakeupEditText.getText() != null) {
-                        Env.wakeupTime = Long.valueOf(wakeupEditText.getText().toString()).longValue();
+                        Env.wakeupTime = Long.valueOf(wakeupEditText.getText().toString()).longValue() * 1000;
                     }
                     //idletime
                     EditText idleEditText = (EditText) findViewById(R.id.idleTimeInput);
                     if (idleEditText.getText() != null) {
-                        Env.idleTime = Long.valueOf(idleEditText.getText().toString()).longValue();
+                        Env.idleTime = Long.valueOf(idleEditText.getText().toString()).longValue() * 1000;
                     }
 
                     // from , to Hour

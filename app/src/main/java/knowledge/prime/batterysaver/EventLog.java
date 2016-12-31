@@ -18,7 +18,7 @@ public class EventLog {
         if (Env.eventLog.size() == MAX_SIZE) {
             Env.eventLog.removeLast();
         }
-        Env.eventLog.addFirst(cls.getSimpleName() + " " + sdf.format(new Date())+ " " + tag + ":" + log);
+        Env.eventLog.addFirst(sdf.format(new Date()) + " " + tag + ":" + log + "[" + cls.getSimpleName() +"]");
         Log.d(tag, log);
     }
 }

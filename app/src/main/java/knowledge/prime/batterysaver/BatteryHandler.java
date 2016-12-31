@@ -18,14 +18,18 @@ public class BatteryHandler {
 
     public static boolean isCharging(Intent batteryStatus) {
         int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        if(status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB) {
+        if(status == BatteryManager.BATTERY_PLUGGED_AC
+                || status == BatteryManager.BATTERY_PLUGGED_USB
+                || status == BatteryManager.BATTERY_PLUGGED_WIRELESS) {
             //充電中
-            EventLog.d(BatteryHandler.class, "plug", "(MainService) always on. because plugged(ac=1, usd=2):" + status);
+            EventLog.d(BatteryHandler.class, "plug", "always on. because plugged(ac=1, usd=2):" + status);
             Env.isPlugged = true;
             Env.intervalType = 0;
             Env.sleepCount = 0;
             return true;
         } else {
+            //プラグを外す
+            EventLog.d(BatteryHandler.class, "plug", "unplugged. status:" + status);
             return false;
         }
     }
