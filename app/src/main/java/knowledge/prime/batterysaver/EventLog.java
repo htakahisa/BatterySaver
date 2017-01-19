@@ -10,12 +10,12 @@ import java.util.Date;
  */
 public class EventLog {
 
-    private static final int MAX_SIZE = 300;
+    private static final int MAX_SIZE = 70;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/M/d H:m:s.SSS");
 
     public static void d(Class<?> cls, String tag, String log) {
-        if (Env.eventLog.size() == MAX_SIZE) {
+        while (Env.eventLog.size() > MAX_SIZE) {
             Env.eventLog.removeLast();
         }
         Env.eventLog.addFirst(sdf.format(new Date()) + " " + tag + ":" + log + "[" + cls.getSimpleName() +"]");
