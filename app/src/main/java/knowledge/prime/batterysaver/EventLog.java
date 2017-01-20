@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class EventLog {
 
-    private static final int MAX_SIZE = 70;
+    private static final int MAX_SIZE = 300;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/M/d H:m:s.SSS");
 
