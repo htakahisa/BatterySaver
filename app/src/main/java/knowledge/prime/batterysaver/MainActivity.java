@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         Env.isScreenOn= pm.isScreenOn();
 
+        //type 6の夜中だけモード
+        setNightMode();
+
         //ON/OFF ボタンイベントの設定
         setOnOffButtonEvent();
 
@@ -58,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         //cellId 追加ボタンイベントの設定
         setCellIdEvent();
-
 
         //初期化
         WifiHandler.init((WifiManager)getSystemService(WIFI_SERVICE));
@@ -70,6 +73,39 @@ public class MainActivity extends AppCompatActivity {
             startService(intent);
         }
 
+    }
+
+    /**
+     * ナイトモードon/off
+     */
+    private void setNightMode() {
+        Switch nightMode = (Switch)findViewById(R.id.switch1);
+        nightMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isOn) {
+                changeNightModeLineLayout(isOn);
+            }
+        });
+    }
+
+    private void changeNightModeLineLayout(boolean isOn) {
+        LinearLayout line1 = (LinearLayout) findViewById(R.id.line1);
+        LinearLayout line2 = (LinearLayout) findViewById(R.id.line2);
+        LinearLayout line3 = (LinearLayout) findViewById(R.id.line3);
+        LinearLayout line4 = (LinearLayout) findViewById(R.id.line4);
+        if (isOn) {
+            Env.intervalType = 6;
+            line1.setVisibility(View.INVISIBLE);
+            line2.setVisibility(View.INVISIBLE);
+            line3.setVisibility(View.INVISIBLE);
+            line4.setVisibility(View.INVISIBLE);
+        } else {
+            Env.intervalType = 0;
+            line1.setVisibility(View.VISIBLE);
+            line2.setVisibility(View.VISIBLE);
+            line3.setVisibility(View.VISIBLE);
+            line4.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -146,6 +182,10 @@ public class MainActivity extends AppCompatActivity {
         fromH.setText(String.valueOf(Env.fromH));
         EditText toH = (EditText)findViewById(R.id.toH);
         toH.setText(String.valueOf(Env.toH));
+
+        Switch nightMode = (Switch)findViewById(R.id.switch1);
+        nightMode.setChecked(Env.intervalType == 6);
+        changeNightModeLineLayout(nightMode.isChecked());
     }
 
 
@@ -326,6 +366,8 @@ public class MainActivity extends AppCompatActivity {
 
         PropertyUtils.setProperty(MainActivity.this, "fromH", Env.fromH);
         PropertyUtils.setProperty(MainActivity.this, "toH", Env.toH);
+
+        PropertyUtils.setProperty(MainActivity.this, "intervalType", Env.intervalType);
 
         StringBuilder sb = new StringBuilder();
         for (String s : Env.wifiCellIdSet) {

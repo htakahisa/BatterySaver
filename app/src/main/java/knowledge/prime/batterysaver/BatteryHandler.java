@@ -24,7 +24,9 @@ public class BatteryHandler {
             //充電中
             EventLog.d(BatteryHandler.class, "plug", "always on. because plugged(ac=1, usd=2):" + status);
             Env.isPlugged = true;
-            Env.intervalType = 0;
+            if (Env.intervalType != 6) {
+                Env.intervalType = 0;
+            }
             Env.sleepCount = 0;
             return true;
         } else {

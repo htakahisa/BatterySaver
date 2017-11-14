@@ -27,7 +27,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/line1">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -67,7 +68,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/line2">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,7 +109,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/line3">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -147,7 +150,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/line4">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -188,7 +192,8 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/line5">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -243,7 +248,24 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/line6">
+
+
+            <Switch
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="NightMode"
+                android:id="@+id/switch1"
+                android:checked="false" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
 
 
 
@@ -260,6 +282,7 @@
                 android:layout_height="wrap_content"
                 android:text="cellId"
                 android:id="@+id/cellIdButton" />
+
 
 
         </LinearLayout>

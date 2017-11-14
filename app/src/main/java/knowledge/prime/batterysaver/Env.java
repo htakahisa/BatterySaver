@@ -58,6 +58,7 @@ public class Env {
             case 3: return sleepTime3;
             case 4: return sleepTime4;
             case 5: return sleepTime5;
+            case 6: return sleepTime5;
         }
         return 0;
     }

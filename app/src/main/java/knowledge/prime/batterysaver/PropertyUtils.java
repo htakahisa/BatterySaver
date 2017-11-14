@@ -65,13 +65,13 @@ public class PropertyUtils {
         Env.count3 = PropertyUtils.getProperty(context, "count3", 3);
         Env.count4 = PropertyUtils.getProperty(context, "count4", 3);
 
+        Env.intervalType = PropertyUtils.getProperty(context, "intervalType", 0).intValue();
+
         String cellIds = PropertyUtils.getProperty(context, "cellIds", "");
         Set<String> cellIdSet = new HashSet<>();
         for (String s : cellIds.split(",")) {
             cellIdSet.add(s);
         }
         Env.wifiCellIdSet = cellIdSet;
-
-        Env.intervalType = 0;
     }
 }

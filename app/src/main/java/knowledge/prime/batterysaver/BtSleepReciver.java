@@ -20,6 +20,11 @@ public class BtSleepReciver extends WakefulBroadcastReceiver {
                 if (BatteryHandler.isCharging()) {
                     return;
                 }
+                if (Env.intervalType == 6) {//6の特殊タイプ
+                    if (!SpecifiedTimeHandler.isSpecifiedTime()) {//指定時間以外はスリープしない
+                        return;
+                    }
+                }
                 //wifi を on にする指定場所ならフラグ変更
                 changeWIfiRestrictedAreaFlag();
 

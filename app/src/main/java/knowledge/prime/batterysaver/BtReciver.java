@@ -32,7 +32,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 // 画面OFF時
                 EventLog.d(this.getClass(), "screen", "SCREEN_OFF");
                 Env.isScreenOn = false;
-                Env.intervalType = 0;
+                if (Env.intervalType != 6) {
+                    Env.intervalType = 0;
+                }
                 Env.sleepCount = 0;
                 resetInterval(context);
                 return;
@@ -122,6 +124,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 return true;
             }
         }
+        if (Env.intervalType == 6) {
+            return false;
+        }
 
         if (Env.sleepCount > maxCount) {
             EventLog.d(this.getClass(), "count", "sleepCount:" + Env.sleepCount + ", maxCount:" + maxCount);
@@ -146,6 +151,7 @@ public class BtReciver extends WakefulBroadcastReceiver {
 
 
     private void resetInterval(Context context) {
+
         long sleepTime = 300000; //初期値は安全のため 5分
         long wakeupTime = Env.wakeupTime;
 
@@ -168,6 +174,9 @@ public class BtReciver extends WakefulBroadcastReceiver {
                 break;
             case 5:
                 sleepTime = Env.sleepTime5;
+                break;
+            case 6:
+                sleepTime = Env.sleepTime5 / 2;// 5の値を1/2使用する
                 break;
         }
 
